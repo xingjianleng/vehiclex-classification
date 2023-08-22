@@ -13,11 +13,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     total_hyperparameter_space = {
-        'hidden_dims': ['', '2048', '4096', '2048,2048'],
+        'hidden_dims': [''],
+        # 'hidden_dims': ['2048'],
         'lr': [1e-3, 5e-4, 1e-4],
         'loss': ['ce', 'focal'],
-        'scheduler': [None, 'cosine', 'lambda'],
-        'batch_size': [0, 512, 1024],
+        'scheduler': [None, 'lambda'],
+        'batch_size': [0, 1024],
         'optim': ['adam', 'sgd', 'rprop']
     }
 
@@ -32,7 +33,7 @@ if __name__ == '__main__':
 
     # worker queue
     worker_queue = queue.Queue()
-    for i in range(4):
+    for i in range(3):
         worker_queue.put(i)
 
     # queue to hold scripts
