@@ -13,12 +13,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     total_hyperparameter_space = {
-        'hidden_dims': [''],
-        # 'hidden_dims': ['2048'],
+        'hidden_dims': ['128'],
         'lr': [1e-3, 5e-4, 1e-4],
         'loss': ['ce', 'focal'],
-        'scheduler': [None, 'lambda'],
+        'scheduler': [None],
         'batch_size': [0, 1024],
+        'activation': ['tanh'],
         'optim': ['adam', 'sgd', 'rprop']
     }
 

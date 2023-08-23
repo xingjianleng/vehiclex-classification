@@ -7,6 +7,7 @@ import sys
 
 import numpy as np
 import torch
+import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 import torchvision.transforms as T
@@ -54,7 +55,9 @@ def main(args):
 
     # model and optimizer
     hidden_dims = [int(x) for x in args.hidden_dims.split(',')] if args.hidden_dims else []
-    model = LinearNet(input_dim=2048, output_dim=1362, hidden_dims=hidden_dims).cuda()
+    actviations = {'relu': nn.ReLU, 'sigmoid': nn.Sigmoid, 'tanh': nn.Tanh}
+    model = LinearNet(input_dim=2048, output_dim=1362, hidden_dims=hidden_dims,
+                      activation_fn=actviations[args.activation]).cuda()
 
     if args.optim == 'adam':
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
@@ -159,6 +162,8 @@ if __name__ == '__main__':
     parser.add_argument('--gamma', type=float, default=2, help='gamma for focal loss')
     # network parameter
     parser.add_argument('--hidden_dims', type=str, default='', help='dimensions of hidden layers, separated by commas')
+    parser.add_argument('--activation', type=str, default='relu', help='activation function',
+                        choices=['relu', 'sigmoid', 'tanh'])
     # optimizer parameter
     parser.add_argument('--optim', type=str, default='adam', help='optimizer',
                         choices=['adam', 'sgd', 'rprop', 'adamw'])
