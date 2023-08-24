@@ -1,53 +1,37 @@
 import argparse
 from itertools import product
+import json
 import os
 import queue
 import subprocess
 import time
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser('main.py runner')
-    parser.add_argument('--cascade', action='store_true', help='Run cascade')
-    parser.add_argument('--hyperparameters', type=str, help='Hyperparameter to vary')
-    args = parser.parse_args()
-
-    total_hyperparameter_space = {
-        'hidden_dims': ['128'],
-        'lr': [1e-3, 5e-4, 1e-4],
-        'loss': ['ce', 'focal'],
-        'scheduler': [None],
-        'batch_size': [0, 1024],
-        'activation': ['tanh'],
-        'optim': ['adam', 'sgd', 'rprop']
-    }
-
-    if args.hyperparameters:
-        hyperparameters = args.hyperparameters.split(',')
-    else:
-        hyperparameters = list(total_hyperparameter_space.keys())        
+def main(args):
+    with open(args.cfg_path, 'r') as fp:
+        cfg = json.load(fp)
+        constr_casc_mode = bool(cfg['constr_casc_mode'])
+        hyperparameters = cfg['hyperparameters']
 
     # create a list of processes
     processes = []
-    hyperparameter_space = {k: v for k, v in total_hyperparameter_space.items() if k in hyperparameters}
 
-    # worker queue
+    # worker queue, each gpu runs 3 processes
+    gpu_ids = [int(gpu_id) for gpu_id in args.gpu_ids.split(',')] * 3
+    assert len(gpu_ids) > 0, 'the script needs to use gpu'
     worker_queue = queue.Queue()
-    for i in range(3):
-        worker_queue.put(i)
+    for id in gpu_ids:
+        worker_queue.put(id)
 
     # queue to hold scripts
     script_arg_queue = queue.Queue()
 
-    combinations = list(product(*total_hyperparameter_space.values()))
-    for combination in combinations:
-        if args.cascade:
-            raise NotImplementedError('Cascade not implemented')
+    for hyperparameter in hyperparameters:
+        if constr_casc_mode:
+            arguments = ['main.py', '--constr_casc']
         else:
-            arguments = ['main_baseline.py']
-        for key, value in zip(total_hyperparameter_space.keys(), combination):
-            if value is not None:
-                arguments.extend([f'--{key}', str(value)])
+            arguments = ['main.py']
+        arguments.extend(hyperparameter)
         script_arg_queue.put(arguments)
 
     total = script_arg_queue.qsize()
@@ -68,7 +52,7 @@ if __name__ == '__main__':
         script_arg = script_arg_queue.get()
 
         env = os.environ.copy()
-        env['CUDA_VISIBLE_DEVICES'] = '1'
+        env['CUDA_VISIBLE_DEVICES'] = str(worker_id)
 
         process = subprocess.Popen(['python'] + script_arg, env=env)
         process.worker_id = worker_id
@@ -78,3 +62,12 @@ if __name__ == '__main__':
     # Wait for all processes to finish
     for process in processes:
         process.wait()
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser('main.py runner')
+    parser.add_argument('--cfg_path', type=str, required=True, help='Path to config file')
+    parser.add_argument('--gpu_ids', type=str, default='0,1', help='GPU IDs to use, separated by commas')
+    args = parser.parse_args()
+
+    main(args)

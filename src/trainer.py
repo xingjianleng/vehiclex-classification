@@ -57,21 +57,27 @@ class NetworkTrainer(object):
                         isinstance(scheduler, torch.optim.lr_scheduler.LambdaLR):
                     scheduler.step(epoch - 1 + batch_idx / len(dataloader))
 
+        train_loss = losses / len(dataloader)
+        train_acc = correct / len(dataloader.dataset) * 100
         precision, recall, f1, _ = precision_recall_fscore_support(np.concatenate(tgts), np.concatenate(preds), average='macro',
                                                                     zero_division=0)
-        self.writer.add_scalar("charts/train_loss", losses / len(dataloader.dataset), epoch)
-        self.writer.add_scalar("charts/train_acc", correct / len(dataloader.dataset) * 100, epoch)
-        self.writer.add_scalar("charts/train_precision", precision * 100, epoch)
-        self.writer.add_scalar("charts/train_recall", recall * 100, epoch)
-        self.writer.add_scalar("charts/train_f1", f1 * 100, epoch)
+        precision *= 100
+        recall *= 100
+        f1 *= 100    
+    
+        self.writer.add_scalar("charts/train_loss", train_loss, epoch)
+        self.writer.add_scalar("charts/train_acc", train_acc, epoch)
+        self.writer.add_scalar("charts/train_precision", precision, epoch)
+        self.writer.add_scalar("charts/train_recall", recall, epoch)
+        self.writer.add_scalar("charts/train_f1", f1, epoch)
         self.writer.add_scalar("charts/lr", optimizer.param_groups[0]['lr'], epoch)
 
         # print training time
         t1 = time.time()
-        print(f'Train loss: {losses / len(dataloader.dataset):.4f}, Accuracy: {100 * correct / len(dataloader.dataset):.4f}%, '
-              f'precision: {precision * 100:.4f}%, recall: {recall * 100:.4f}%, f1: {f1 * 100:.4f}%')
+        print(f'Train loss: {train_loss:.6f}, Accuracy: {train_acc:.4f}%, '
+              f'precision: {precision:.4f}%, recall: {recall:.4f}%, f1: {f1:.4f}%')
         print(f'Training time: {t1 - t0:.2f}s')
-        return losses / len(dataloader.dataset), correct / len(dataloader.dataset)
+        return train_loss, train_acc
 
     def test(self, dataloader, epoch=None):
         # set model to evaluation mode
@@ -103,17 +109,23 @@ class NetworkTrainer(object):
                 preds.append(pred.detach().cpu().numpy())
                 tgts.append(target.detach().cpu().numpy())
 
+        test_loss /= len(dataloader)
+        test_acc = correct / len(dataloader.dataset) * 100
         precision, recall, f1, _ = precision_recall_fscore_support(np.concatenate(tgts), np.concatenate(preds), average='macro',
                                                                    zero_division=0)
+        precision *= 100
+        recall *= 100
+        f1 *= 100
+
         if epoch:
-            self.writer.add_scalar("charts/val_loss", test_loss / len(dataloader.dataset), epoch)
-            self.writer.add_scalar("charts/val_acc", correct * 100 / len(dataloader.dataset), epoch)
-            self.writer.add_scalar("charts/val_precision", precision * 100, epoch)
-            self.writer.add_scalar("charts/val_recall", recall * 100, epoch)
-            self.writer.add_scalar("charts/val_f1", f1 * 100, epoch)
+            self.writer.add_scalar("charts/val_loss", test_loss / len(dataloader), epoch)
+            self.writer.add_scalar("charts/val_acc", test_acc, epoch)
+            self.writer.add_scalar("charts/val_precision", precision, epoch)
+            self.writer.add_scalar("charts/val_recall", recall, epoch)
+            self.writer.add_scalar("charts/val_f1", f1, epoch)
 
         # print test results
-        test_loss /= len(dataloader.dataset)
-        print(f'\nTest set: Average loss: {test_loss:.4f}, Accuracy: {100 * correct / len(dataloader.dataset):.4f}%, '
-                f'Precision: {precision * 100:.4f}%, Recall: {recall * 100:.4f}%, F1: {f1 * 100:.4f}%\n')
-        return test_loss, correct / len(dataloader.dataset)
+        
+        print(f'\n{"Val" if epoch else "Test"} set: Average loss: {test_loss:.6f}, Accuracy: {test_acc:.4f}%, '
+                f'Precision: {precision:.4f}%, Recall: {recall:.4f}%, F1: {f1:.4f}%\n')
+        return test_loss, test_acc

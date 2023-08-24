@@ -12,7 +12,7 @@ def draw_curve(path, x_epoch, train_loss, test_loss, train_result, test_result):
     sns.lineplot(x=x_epoch, y=test_result, ax=ax[1], color='red', marker='o', label='test' + ': {:.1f}'.format(test_result[-1]))
 
     ax[0].set_title('loss')
-    ax[1].set_title('result')
+    ax[1].set_title('result in %')
 
     ax[0].legend()
     ax[1].legend()

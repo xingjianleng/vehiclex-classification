@@ -1,0 +1,19 @@
+{
+    "constr_casc_mode": 0,
+    "hyperparameters":
+    [
+        ["-b", "1024", "--lr", "1e-3", "--optim", "adam"],
+        ["-b", "1024", "--lr", "5e-4", "--optim", "adam"],
+        ["-b", "1024", "--lr", "1e-4", "--optim", "adam"],
+        ["-b", "0", "--lr", "5e-4", "--optim", "adam"],
+        
+        ["-b", "0", "--lr", "1e-2", "--optim", "rprop"],
+        ["-b", "0", "--lr", "5e-4", "--optim", "rprop"],
+        ["-b", "1024", "--lr", "1e-2", "--optim", "rprop"],
+        
+        ["-b", "1024", "--lr", "5e-4", "--optim", "sgd"],
+    
+        ["-b", "1024", "--lr", "5e-4", "--optim", "adam", "--loss", "focal"],
+        ["-b", "0", "--lr", "1e-2", "--optim", "rprop", "--loss", "focal"]
+    ]
+}
