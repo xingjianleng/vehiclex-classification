@@ -1,5 +1,4 @@
 import argparse
-from itertools import product
 import json
 import os
 import queue
@@ -10,14 +9,14 @@ import time
 def main(args):
     with open(args.cfg_path, 'r') as fp:
         cfg = json.load(fp)
-        constr_casc_mode = bool(cfg['constr_casc_mode'])
-        hyperparameters = cfg['hyperparameters']
+        logdir = cfg['logdir']
+        configs = cfg['configs']
 
     # create a list of processes
     processes = []
 
-    # worker queue, each gpu runs 3 processes
-    gpu_ids = [int(gpu_id) for gpu_id in args.gpu_ids.split(',')] * 3
+    # worker queue, each gpu runs 2 processes
+    gpu_ids = [int(gpu_id) for gpu_id in args.gpu_ids.split(',')] * 2
     assert len(gpu_ids) > 0, 'the script needs to use gpu'
     worker_queue = queue.Queue()
     for id in gpu_ids:
@@ -26,12 +25,14 @@ def main(args):
     # queue to hold scripts
     script_arg_queue = queue.Queue()
 
-    for hyperparameter in hyperparameters:
+    for config in configs:
+        constr_casc_mode = config['constr_casc_mode']
+        hyperparameters = config['hyperparameters']
         if constr_casc_mode:
-            arguments = ['main.py', '--constr_casc']
+            arguments = ['main.py', '--constr_casc', '--log_dir', logdir]
         else:
-            arguments = ['main.py']
-        arguments.extend(hyperparameter)
+            arguments = ['main.py', '--logdir', logdir]
+        arguments.extend(hyperparameters)
         script_arg_queue.put(arguments)
 
     total = script_arg_queue.qsize()
@@ -67,7 +68,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('main.py runner')
     parser.add_argument('--cfg_path', type=str, required=True, help='Path to config file')
-    parser.add_argument('--gpu_ids', type=str, default='0,1', help='GPU IDs to use, separated by commas')
+    parser.add_argument('--gpu_ids', type=str, default='0,1,2,3', help='GPU IDs to use, separated by commas')
     args = parser.parse_args()
 
     main(args)

@@ -19,7 +19,7 @@ from src.models.baseline import LinearNet
 from src.models.constr_casc import ConstructiveCascadeNetwork
 from src.utils.draw_curve import draw_curve
 from src.utils.logger import Logger
-from src.utils.util_func import update_optimizer
+from src.utils.constr_casc_util import update_optimizer
 
 
 def main(args):
@@ -64,10 +64,10 @@ def main(args):
                           'L2': args.lr * args.l2_ratio,
                           'L3': args.lr * args.l3_ratio}
         model = ConstructiveCascadeNetwork(input_dim=2048, output_dim=1362, initial_hidden_dim=hidden_dims[0],
-                                        activation_fn=actviations[args.activation]).cuda()
+                                        activation_fn=actviations[args.activation], weight_init=args.weight_init).cuda()
     else:
         model = LinearNet(input_dim=2048, output_dim=1362, hidden_dims=hidden_dims,
-                        activation_fn=actviations[args.activation]).cuda()
+                        activation_fn=actviations[args.activation], weight_init=args.weight_init).cuda()
 
     if args.optim == 'adam':
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
@@ -86,13 +86,13 @@ def main(args):
                    f'dropout{args.cascade_dropout}_casc_thresh{args.threshold}' \
                    f'_max_casc_layer{args.max_cascade_layers}' \
                    f'_l2{args.l2_ratio}_l3{args.l3_ratio}_'
-    logdir = f'logs/{"DEBUG_" if is_debug else ""}{"CONSTR_CASC" if args.constr_casc else "BASELINE"}_' \
+    logdir = f'{args.logdir}{"DEBUG_" if is_debug else ""}{"CONSTR_CASC" if args.constr_casc else "BASELINE"}_' \
              f'lr{args.lr}_b{args.batch_size}_e{args.epochs}_' \
              f'optim{args.optim}_hidden[{args.hidden_dims}]_scheduler{args.scheduler}' \
              f'_loss{args.loss}_gamma{args.gamma}_wd{args.weight_decay}' \
              f'{cascade_info if args.constr_casc else "_"}'\
              f'{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}' if not args.eval \
-        else f'logs/{args.dataset}/EVAL_{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}'
+        else f'{args.logdir}{args.dataset}/EVAL_{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}'
     os.makedirs(logdir, exist_ok=True)
     copy_tree('src', logdir + '/scripts/src')
     for script in os.listdir('.'):
@@ -188,6 +188,8 @@ if __name__ == '__main__':
     parser.add_argument('--hidden_dims', type=str, default='128', help='dimensions of hidden layers, separated by commas')
     parser.add_argument('--activation', type=str, default='tanh', help='activation function',
                         choices=['relu', 'sigmoid', 'tanh'])
+    parser.add_argument('--weight_init', type=str, default='xavier', help='weight initialization',
+                        choices=['xavier', 'kaiming'])
     # optimizer parameter
     parser.add_argument('--optim', type=str, default='adam', help='optimizer',
                         choices=['adam', 'sgd', 'rprop', 'adamw'])
@@ -204,6 +206,7 @@ if __name__ == '__main__':
     parser.add_argument('--l3_ratio', type=float, default=0.1, help='ratio of l3 step size for cascade layer')
     # other parameters
     parser.add_argument('--eval', action='store_true', help='evaluation mode')
+    parser.add_argument('--logdir', type=str, default='./logs/', help='log directory')
     parser.add_argument('--log_epoch', type=int, default=25, help='interval of epochs of taking the log')
     parser.add_argument('--seed', type=int, default=42, help='random seed')
 

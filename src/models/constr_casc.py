@@ -1,13 +1,16 @@
 import torch
 import torch.nn as nn
 
+from src.utils.weight_init import layer_init
+
 
 class ConstructiveCascadeNetwork(nn.Module):
-    def __init__(self, input_dim, output_dim, initial_hidden_dim, activation_fn=nn.ReLU):
+    def __init__(self, input_dim, output_dim, initial_hidden_dim, activation_fn=nn.ReLU, weight_init='xavier'):
         super(ConstructiveCascadeNetwork, self).__init__()
         self.input_dim = input_dim
         self.activation_fn = activation_fn
         self.total_hidden_dim = initial_hidden_dim
+        self.weight_init = weight_init
 
         # Initial hidden layer, as in the paper, should be a single fully connected layer
         self.initial_hidden_layer = nn.Sequential(
@@ -20,6 +23,11 @@ class ConstructiveCascadeNetwork(nn.Module):
 
         # Initial output layer
         self.output_layers = nn.ModuleList([nn.Linear(initial_hidden_dim, output_dim)])
+        
+        # Initialize weights
+        for module in self.modules():
+            if isinstance(module, nn.Linear):
+                layer_init(module, self.weight_init)
 
     def forward(self, x):
         # List to store outputs of all cascade layers and the input
@@ -50,7 +58,7 @@ class ConstructiveCascadeNetwork(nn.Module):
         # New cascade layer will be connected to the input, initial hidden layer, and all previous cascade layers
         new_cascade_input_dim = self.input_dim + self.total_hidden_dim
         new_cascade_layer = nn.Sequential(
-            nn.Linear(new_cascade_input_dim, new_cascade_dim),
+            layer_init(nn.Linear(new_cascade_input_dim, new_cascade_dim), self.weight_init),
             self.activation_fn(),
             nn.Dropout(dropout_rate)
         ).to(curr_device)
@@ -58,5 +66,6 @@ class ConstructiveCascadeNetwork(nn.Module):
         self.total_hidden_dim += new_cascade_dim
 
         # Create new output layer
-        new_output_layer = nn.Linear(new_cascade_dim, self.output_layers[0].out_features).to(curr_device)
+        new_output_layer = layer_init(
+            nn.Linear(new_cascade_dim, self.output_layers[0].out_features), self.weight_init).to(curr_device)
         self.output_layers.append(new_output_layer)
