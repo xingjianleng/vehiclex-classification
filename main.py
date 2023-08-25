@@ -89,7 +89,7 @@ def main(args):
     logdir = f'{args.logdir}{"DEBUG_" if is_debug else ""}{"CONSTR_CASC" if args.constr_casc else "BASELINE"}_' \
              f'lr{args.lr}_b{args.batch_size}_e{args.epochs}_' \
              f'optim{args.optim}_hidden[{args.hidden_dims}]_scheduler{args.scheduler}' \
-             f'_loss{args.loss}_gamma{args.gamma}_wd{args.weight_decay}' \
+             f'_loss{args.loss}_gamma{args.gamma}_wd{args.weight_decay}_seed{args.seed}' \
              f'{cascade_info if args.constr_casc else "_"}'\
              f'{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}' if not args.eval \
         else f'{args.logdir}{args.dataset}/EVAL_{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}'
