@@ -15,6 +15,10 @@ def main(args):
     # create a list of processes
     processes = []
 
+    # set random seeds
+    seeds = [int(seed) for seed in args.random_seeds.split(',')]
+    assert len(seeds) > 0, 'the script needs to use random seeds'
+
     # worker queue, each gpu runs 2 processes
     gpu_ids = [int(gpu_id) for gpu_id in args.gpu_ids.split(',')] * 2
     assert len(gpu_ids) > 0, 'the script needs to use gpu'
@@ -29,11 +33,12 @@ def main(args):
         constr_casc_mode = config['constr_casc_mode']
         hyperparameters = config['hyperparameters']
         if constr_casc_mode:
-            arguments = ['main.py', '--constr_casc', '--log_dir', logdir]
+            arguments = ['main.py', '--constr_casc', '--logdir', logdir]
         else:
             arguments = ['main.py', '--logdir', logdir]
         arguments.extend(hyperparameters)
-        script_arg_queue.put(arguments)
+        for seed in seeds:
+            script_arg_queue.put(arguments + ['--seed', str(seed)])
 
     total = script_arg_queue.qsize()
     while not script_arg_queue.empty():
@@ -69,6 +74,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser('main.py runner')
     parser.add_argument('--cfg_path', type=str, required=True, help='Path to config file')
     parser.add_argument('--gpu_ids', type=str, default='0,1,2,3', help='GPU IDs to use, separated by commas')
+    parser.add_argument('--random_seeds', type=str, default='0,13,21,42,389', help='Random seeds to use, separated by commas')
     args = parser.parse_args()
 
     main(args)

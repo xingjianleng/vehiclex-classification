@@ -128,4 +128,4 @@ class NetworkTrainer(object):
         
         print(f'\n{"Val" if epoch else "Test"} set: Average loss: {test_loss:.6f}, Accuracy: {test_acc:.4f}%, '
                 f'Precision: {precision:.4f}%, Recall: {recall:.4f}%, F1: {f1:.4f}%\n')
-        return test_loss, test_acc
+        return test_loss, test_acc, precision, recall, f1

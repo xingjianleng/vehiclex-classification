@@ -141,7 +141,6 @@ def main(args):
 
     # learning
     if not args.eval:
-        # trainer.test(test_loader)
         for epoch in tqdm.tqdm(range(1, args.epochs + 1)):
             train_loss, train_acc = trainer.train(epoch, train_loader, optimizer, scheduler)
 
@@ -153,7 +152,7 @@ def main(args):
                 print('New cascade layer added, total hidden dimension: ', model.total_hidden_dim)
 
             if epoch % args.log_epoch == 0:
-                val_loss, val_acc = trainer.test(val_loader, epoch)
+                val_loss, val_acc, _, _, _ = trainer.test(val_loader, epoch)
                 # draw & save
                 x_epoch.append(epoch)
                 train_loss_s.append(train_loss)
@@ -166,9 +165,10 @@ def main(args):
 
     print('Test loaded model...')
     print(logdir)
-    _, test_acc = trainer.test(test_loader)
-    with open(os.path.join(logdir, 'test_acc.txt'), 'w') as f:
-        f.write(f'{test_acc:.6f}')
+    test_results = trainer.test(test_loader)
+    with open(os.path.join(logdir, 'test_results.txt'), 'w') as f:
+        for test_result in test_results[1:]:
+            f.write(f'{test_result:.6f}\n')
     writer.close()
 
 
@@ -201,9 +201,9 @@ if __name__ == '__main__':
     parser.add_argument('--cascade_hidden_dim', type=int, default=64, help='hidden dimension of cascade layer')
     parser.add_argument('--cascade_dropout', type=float, default=0.0, help='dropout rate of cascade layer')
     parser.add_argument('--max_cascade_layers', type=int, default=None, help='maximum number of cascade layers')
-    parser.add_argument('--threshold', type=float, default=0.03, help='threshold for adding a new cascade layer')
-    parser.add_argument('--l2_ratio', type=float, default=0.2, help='ratio of l2 step size for cascade layer')
-    parser.add_argument('--l3_ratio', type=float, default=0.1, help='ratio of l3 step size for cascade layer')
+    parser.add_argument('--threshold', type=float, default=1.8, help='threshold for adding a new cascade layer')
+    parser.add_argument('--l2_ratio', type=float, default=5e-4, help='ratio of l2 step size for cascade layer')
+    parser.add_argument('--l3_ratio', type=float, default=1e-4, help='ratio of l3 step size for cascade layer')
     # other parameters
     parser.add_argument('--eval', action='store_true', help='evaluation mode')
     parser.add_argument('--logdir', type=str, default='./logs/', help='log directory')
