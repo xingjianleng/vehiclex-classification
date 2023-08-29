@@ -83,9 +83,9 @@ def main(args):
 
     # logging
     cascade_info = f'_casc_hidden{args.cascade_hidden_dim}_casc_' \
-                   f'dropout{args.cascade_dropout}_casc_thresh{args.threshold}' \
+                   f'dropout{args.cascade_dropout}_casc_thresh{args.threshold}_thresh_decay{args.threshold_decay}' \
                    f'_max_casc_layer{args.max_cascade_layers}' \
-                   f'_l2{args.l2_ratio}_l3{args.l3_ratio}_'
+                   f'_l2{args.l2_ratio}_l3{args.l3_ratio}_max_iter{args.max_cascade_iter}'
     logdir = f'{args.logdir}{"DEBUG_" if is_debug else ""}{"CONSTR_CASC" if args.constr_casc else "BASELINE"}_' \
              f'lr{args.lr}_b{args.batch_size}_e{args.epochs}_' \
              f'optim{args.optim}_hidden[{args.hidden_dims}]_scheduler{args.scheduler}' \
@@ -145,10 +145,13 @@ def main(args):
             train_loss, train_acc = trainer.train(epoch, train_loader, optimizer, scheduler)
 
             # Constructive Cascade Network add cascade layer
-            if args.constr_casc and train_loss < args.threshold and \
+            if args.constr_casc and (train_loss < args.threshold or epoch % args.max_cascade_iter == 0) and \
                     (args.max_cascade_layers is None or len(model.cascade_layers) < args.max_cascade_layers):
                 model.add_cascade_layer(args.cascade_hidden_dim, args.cascade_dropout)
                 update_optimizer(optimizer, model, learning_rates)
+                print(f'Previous threshold: {args.threshold:.6f}')
+                args.threshold *= args.threshold_decay
+                print(f'New threshold: {args.threshold:.6f}')
                 print('New cascade layer added, total hidden dimension: ', model.total_hidden_dim)
 
             if epoch % args.log_epoch == 0:
@@ -201,7 +204,10 @@ if __name__ == '__main__':
     parser.add_argument('--cascade_hidden_dim', type=int, default=64, help='hidden dimension of cascade layer')
     parser.add_argument('--cascade_dropout', type=float, default=0.0, help='dropout rate of cascade layer')
     parser.add_argument('--max_cascade_layers', type=int, default=None, help='maximum number of cascade layers')
-    parser.add_argument('--threshold', type=float, default=1.8, help='threshold for adding a new cascade layer')
+    parser.add_argument('--max_cascade_iter', type=int, default=1001,
+                        help='maximum number of iterations for adding a new cascade layer')
+    parser.add_argument('--threshold', type=float, default=3.0, help='threshold for adding a new cascade layer')
+    parser.add_argument('--threshold_decay', type=float, default=1.0, help='decay rate of threshold')
     parser.add_argument('--l2_ratio', type=float, default=5e-4, help='ratio of l2 step size for cascade layer')
     parser.add_argument('--l3_ratio', type=float, default=1e-4, help='ratio of l3 step size for cascade layer')
     # other parameters
