@@ -29,8 +29,8 @@ def extract_info_from_refined_string(s):
         d['casc_thresh'] = float(re.search('_casc_thresh([\d.]+)', s).group(1))
         d['thresh_decay'] = float(re.search('_thresh_decay([\d.]+)', s).group(1))
         d['max_casc_layer'] = int(re.search('_max_casc_layer(\d+)', s).group(1))
-        d['l2'] = float(re.search('_l2([\d.]+)', s).group(1))
-        d['l3'] = float(re.search('_l3([\d.]+)', s).group(1))
+        d['l2'] = float(re.search('_l2([\d.e-]+)', s).group(1))
+        d['l3'] = float(re.search('_l3([\d.e-]+)', s).group(1))
         d['max_iter'] = int(re.search('_max_iter(\d+)_', s).group(1))
 
     return hash_hyper(d), d
