@@ -10,6 +10,17 @@
             "constr_casc_mode": 1,
             "hyperparameters": ["-b", "0", "--epochs", "1000", "--hidden_dims", "128", "--lr", "0.01", "--optim", "rprop", "--cascade_hidden_dim", "64", "--max_cascade_iter", "200", "--max_cascade_layers", "5", "--threshold", "3.", "--threshold_decay", "1.", "--cascade_dropout", "0.5", "--l2", "5e-4", "--l3", "1e-4"]
         },
+
+        {
+            "constr_casc_mode": 1,
+            "hyperparameters": ["-b", "0", "--epochs", "1000", "--hidden_dims", "128", "--lr", "0.01", "--optim", "rprop", "--cascade_hidden_dim", "64", "--max_cascade_iter", "200", "--max_cascade_layers", "5", "--threshold", "3.", "--threshold_decay", "0.9", "--cascade_dropout", "0.5", "--l2", "5e-4", "--l3", "1e-4"]
+        },
+
+        {
+            "constr_casc_mode": 1,
+            "hyperparameters": ["-b", "0", "--epochs", "1000", "--hidden_dims", "128", "--lr", "0.01", "--optim", "rprop", "--cascade_hidden_dim", "64", "--max_cascade_iter", "200", "--max_cascade_layers", "5", "--threshold", "3.", "--threshold_decay", "0.8", "--cascade_dropout", "0.5", "--l2", "5e-4", "--l3", "1e-4"]
+        },
+
         {
             "constr_casc_mode": 1,
             "hyperparameters": ["-b", "0", "--epochs", "1000", "--hidden_dims", "128", "--lr", "0.01", "--optim", "rprop", "--cascade_hidden_dim", "64", "--max_cascade_iter", "200", "--max_cascade_layers", "5", "--threshold", "3.", "--threshold_decay", "1.", "--cascade_dropout", "0.5", "--l2", "5e-5", "--l3", "1e-5"]
@@ -19,23 +30,20 @@
             "constr_casc_mode": 1,
             "hyperparameters": ["-b", "0", "--epochs", "1000", "--hidden_dims", "128", "--lr", "0.01", "--optim", "rprop", "--cascade_hidden_dim", "64", "--max_cascade_iter", "200", "--max_cascade_layers", "5", "--threshold", "2.3", "--threshold_decay", "1.", "--cascade_dropout", "0.5", "--l2", "5e-4", "--l3", "1e-4"]
         },
-        {
-            "constr_casc_mode": 1,
-            "hyperparameters": ["-b", "0", "--epochs", "1000", "--hidden_dims", "128", "--lr", "0.01", "--optim", "rprop", "--cascade_hidden_dim", "64", "--max_cascade_iter", "200", "--max_cascade_layers", "5", "--threshold", "2.3", "--threshold_decay", "1.", "--cascade_dropout", "0.5", "--l2", "5e-5", "--l3", "1e-5"]
-        },
 
         {
             "constr_casc_mode": 1,
             "hyperparameters": ["-b", "0", "--epochs", "1000", "--hidden_dims", "128", "--lr", "0.01", "--optim", "rprop", "--cascade_hidden_dim", "64", "--max_cascade_iter", "200", "--max_cascade_layers", "5", "--threshold", "1.5", "--threshold_decay", "1.", "--cascade_dropout", "0.5", "--l2", "5e-4", "--l3", "1e-4"]
         },
-        {
-            "constr_casc_mode": 1,
-            "hyperparameters": ["-b", "0", "--epochs", "1000", "--hidden_dims", "128", "--lr", "0.01", "--optim", "rprop", "--cascade_hidden_dim", "64", "--max_cascade_iter", "200", "--max_cascade_layers", "5", "--threshold", "1.5", "--threshold_decay", "1.", "--cascade_dropout", "0.5", "--l2", "5e-5", "--l3", "1e-5"]
-        },
 
         {
             "constr_casc_mode": 1,
             "hyperparameters": ["-b", "0", "--epochs", "1000", "--hidden_dims", "128", "--lr", "0.01", "--optim", "rprop", "--cascade_hidden_dim", "64", "--max_cascade_iter", "200", "--max_cascade_layers", "5", "--threshold", "2.3", "--threshold_decay", "1.", "--cascade_dropout", "0.", "--l2", "5e-4", "--l3", "1e-4"]
+        },
+
+        {
+            "constr_casc_mode": 1,
+            "hyperparameters": ["-b", "0", "--epochs", "1000", "--hidden_dims", "128", "--lr", "0.01", "--optim", "rprop", "--cascade_hidden_dim", "32", "--max_cascade_iter", "200", "--max_cascade_layers", "5", "--threshold", "3.", "--threshold_decay", "1.", "--cascade_dropout", "0.5", "--l2", "5e-4", "--l3", "1e-4"]
         }
     ]
 }
