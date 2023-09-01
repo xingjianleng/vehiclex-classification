@@ -34,6 +34,9 @@ def update_optimizer(optimizer, model, learning_rates):
     del existing_hyperparams['params']
     del existing_hyperparams['lr']
 
+    # Delete the existing parameter groups
+    optimizer.param_groups = []
+
     groups_weights = [group1_weights, group2_weights, group3_weights]
     for param_group, lr in zip(groups_weights, learning_rates.values()):    
         # Append new parameter groups for the optimizer

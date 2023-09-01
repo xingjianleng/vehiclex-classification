@@ -3,50 +3,50 @@
     "configs": [
         {
             "constr_casc_mode": 0,
-            "hyperparameters": ["-b", "1024", "--lr", "1e-3", "--optim", "adam"]
+            "hyperparameters": ["-b", "1024", "--epochs", "1000", "--hidden_dims", "128", "--lr", "1e-3", "--optim", "adam"]
         },
         {
             "constr_casc_mode": 0,
-            "hyperparameters": ["-b", "1024", "--lr", "5e-4", "--optim", "adam"]
+            "hyperparameters": ["-b", "1024", "--epochs", "1000", "--hidden_dims", "128", "--lr", "5e-4", "--optim", "adam"]
         },
         {
             "constr_casc_mode": 0,
-            "hyperparameters": ["-b", "1024", "--lr", "1e-4", "--optim", "adam"]
+            "hyperparameters": ["-b", "1024", "--epochs", "1000", "--hidden_dims", "128", "--lr", "1e-4", "--optim", "adam"]
         },
         {
             "constr_casc_mode": 0,
-            "hyperparameters": ["-b", "0", "--lr", "5e-4", "--optim", "adam"]
-        },
-
-        {
-            "constr_casc_mode": 0,
-            "hyperparameters": ["-b", "0", "--lr", "1e-2", "--optim", "rprop"]
-        },
-        {
-            "constr_casc_mode": 0,
-            "hyperparameters": ["-b", "0", "--lr", "5e-4", "--optim", "rprop"]
-        },
-        {
-            "constr_casc_mode": 0,
-            "hyperparameters": ["-b", "1024", "--lr", "1e-2", "--optim", "rprop"]
+            "hyperparameters": ["-b", "0", "--epochs", "1000", "--hidden_dims", "128", "--lr", "5e-4", "--optim", "adam"]
         },
 
         {
             "constr_casc_mode": 0,
-            "hyperparameters": ["-b", "1024", "--lr", "5e-4", "--optim", "sgd"]
+            "hyperparameters": ["-b", "0", "--epochs", "1000", "--hidden_dims", "128", "--lr", "1e-2", "--optim", "rprop"]
+        },
+        {
+            "constr_casc_mode": 0,
+            "hyperparameters": ["-b", "0", "--epochs", "1000", "--hidden_dims", "128", "--lr", "5e-4", "--optim", "rprop"]
+        },
+        {
+            "constr_casc_mode": 0,
+            "hyperparameters": ["-b", "1024", "--epochs", "1000", "--hidden_dims", "128", "--lr", "1e-2", "--optim", "rprop"]
         },
 
         {
             "constr_casc_mode": 0,
-            "hyperparameters": ["-b", "1024", "--lr", "5e-4", "--optim", "adam", "--loss", "focal"]
+            "hyperparameters": ["-b", "1024", "--epochs", "1000", "--hidden_dims", "128", "--lr", "5e-4", "--optim", "sgd"]
+        },
+
+        {
+            "constr_casc_mode": 0,
+            "hyperparameters": ["-b", "1024", "--epochs", "1000", "--hidden_dims", "128", "--lr", "5e-4", "--optim", "adam", "--loss", "focal"]
         },
         {
             "constr_casc_mode": 0,
-            "hyperparameters": ["-b", "1024", "--lr", "1e-4", "--optim", "adam", "--loss", "focal"]
+            "hyperparameters": ["-b", "1024", "--epochs", "1000", "--hidden_dims", "128", "--lr", "1e-4", "--optim", "adam", "--loss", "focal"]
         },
         {
             "constr_casc_mode": 0,
-            "hyperparameters": ["-b", "0", "--lr", "1e-2", "--optim", "rprop", "--loss", "focal"]
+            "hyperparameters": ["-b", "0", "--epochs", "1000", "--hidden_dims", "128", "--lr", "1e-2", "--optim", "rprop", "--loss", "focal"]
         }
     ]
 }

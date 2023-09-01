@@ -61,8 +61,8 @@ def main(args):
     if args.constr_casc:
         assert len(hidden_dims) == 1, 'Allow exactly one initial hidden layer for constructive cascade network'
         learning_rates = {'L1': args.lr,
-                          'L2': args.lr * args.l2_ratio,
-                          'L3': args.lr * args.l3_ratio}
+                          'L2': args.l2,
+                          'L3': args.l3}
         model = ConstructiveCascadeNetwork(input_dim=2048, output_dim=1362, initial_hidden_dim=hidden_dims[0],
                                         activation_fn=actviations[args.activation], weight_init=args.weight_init).cuda()
     else:
@@ -85,7 +85,7 @@ def main(args):
     cascade_info = f'_casc_hidden{args.cascade_hidden_dim}_casc_' \
                    f'dropout{args.cascade_dropout}_casc_thresh{args.threshold}_thresh_decay{args.threshold_decay}' \
                    f'_max_casc_layer{args.max_cascade_layers}' \
-                   f'_l2{args.l2_ratio}_l3{args.l3_ratio}_max_iter{args.max_cascade_iter}'
+                   f'_l2{args.l2}_l3{args.l3}_max_iter{args.max_cascade_iter}_'
     logdir = f'{args.logdir}{"DEBUG_" if is_debug else ""}{"CONSTR_CASC" if args.constr_casc else "BASELINE"}_' \
              f'lr{args.lr}_b{args.batch_size}_e{args.epochs}_' \
              f'optim{args.optim}_hidden[{args.hidden_dims}]_scheduler{args.scheduler}' \
@@ -182,7 +182,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_workers', type=int, default=4, help='number of workers for data loading')
     parser.add_argument('--batch_size', '-b', type=int, default=0, help='batch size')
     # training parameter
-    parser.add_argument('--lr', type=float, default=5e-4, help='learning rate')
+    parser.add_argument('--lr', type=float, default=0.01, help='learning rate')
     parser.add_argument('--epochs', type=int, default=1000, help='number of train epochs')
     parser.add_argument('--loss', type=str, default='ce', help='loss function',
                         choices=['ce', 'focal'])
@@ -194,22 +194,22 @@ if __name__ == '__main__':
     parser.add_argument('--weight_init', type=str, default='xavier', help='weight initialization',
                         choices=['xavier', 'kaiming'])
     # optimizer parameter
-    parser.add_argument('--optim', type=str, default='adam', help='optimizer',
+    parser.add_argument('--optim', type=str, default='rprop', help='optimizer',
                         choices=['adam', 'sgd', 'rprop', 'adamw'])
     parser.add_argument('--weight_decay', type=float, default=5e-4, help='weight decay')
     parser.add_argument('--scheduler', type=str, default=None, help='scheduler',
                         choices=['cosine', 'cosine_restart', 'lambda'])
     # construct cascade parameters
     parser.add_argument('--constr_casc', action='store_true', help='use constructive cascade network')
-    parser.add_argument('--cascade_hidden_dim', type=int, default=64, help='hidden dimension of cascade layer')
+    parser.add_argument('--cascade_hidden_dim', type=int, default=16, help='hidden dimension of cascade layer')
     parser.add_argument('--cascade_dropout', type=float, default=0.0, help='dropout rate of cascade layer')
     parser.add_argument('--max_cascade_layers', type=int, default=None, help='maximum number of cascade layers')
-    parser.add_argument('--max_cascade_iter', type=int, default=1001,
+    parser.add_argument('--max_cascade_iter', type=int, default=1000,
                         help='maximum number of iterations for adding a new cascade layer')
     parser.add_argument('--threshold', type=float, default=3.0, help='threshold for adding a new cascade layer')
     parser.add_argument('--threshold_decay', type=float, default=1.0, help='decay rate of threshold')
-    parser.add_argument('--l2_ratio', type=float, default=5e-4, help='ratio of l2 step size for cascade layer')
-    parser.add_argument('--l3_ratio', type=float, default=1e-4, help='ratio of l3 step size for cascade layer')
+    parser.add_argument('--l2', type=float, default=5e-4, help='l2 step size for cascade layer')
+    parser.add_argument('--l3', type=float, default=1e-4, help='l3 step size for cascade layer')
     # other parameters
     parser.add_argument('--eval', action='store_true', help='evaluation mode')
     parser.add_argument('--logdir', type=str, default='./logs/', help='log directory')
