@@ -51,7 +51,8 @@ def main(args):
 
     hash_to_hyper = {}
     hash_to_results = {}
-    out_tbl = pd.DataFrame()
+    avg_tbl = pd.DataFrame()
+    std_tbl = pd.DataFrame()
 
     # extract hyperparameters and results
     for log in logs:
@@ -77,7 +78,9 @@ def main(args):
         hyper = hash_to_hyper[hash]
         tbl = pd.DataFrame(results)
         avg_row = tbl.mean()
-        out_tbl = pd.concat([out_tbl, pd.DataFrame([avg_row])], ignore_index=True)
+        std_row = tbl.std()
+        avg_tbl = pd.concat([avg_tbl, pd.DataFrame([avg_row])], ignore_index=True)
+        std_tbl = pd.concat([std_tbl, pd.DataFrame([std_row])], ignore_index=True)
 
     # create output directory
     outdir = os.path.join(args.outdir, args.partition)
@@ -85,15 +88,17 @@ def main(args):
         os.makedirs(outdir)
 
     # sort based on accuracy (descending)
-    idx_sorted = np.argsort(out_tbl['acc'].values)[::-1]
-    out_tbl = out_tbl.iloc[idx_sorted].reset_index(drop=True)
+    idx_sorted = np.argsort(avg_tbl['acc'].values)[::-1]
+    avg_tbl = avg_tbl.iloc[idx_sorted].reset_index(drop=True)
+    std_tbl = std_tbl.iloc[idx_sorted].reset_index(drop=True)
 
     # save tables
-    out_tbl.to_csv(os.path.join(outdir, f'average_metrics.csv'))
+    avg_tbl.to_csv(os.path.join(outdir, f'average_metrics.csv'))
+    std_tbl.to_csv(os.path.join(outdir, f'std_metrics.csv'))
 
     # save hyperparameters
     hypers = []
-    for i in range(len(out_tbl)):
+    for i in range(len(avg_tbl)):
         hyper = hash_to_hyper[list(hash_to_hyper.keys())[idx_sorted[i]]]
         hypers.append(hyper)
 
