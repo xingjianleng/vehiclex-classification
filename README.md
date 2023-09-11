@@ -1,4 +1,4 @@
-# COMP4660-assignment
+# vehicle-x-classification
 Implementing Constructive Cascade Network technique [(Khoo *et al*., 2009)](https://link.springer.com/chapter/10.1007/978-3-642-03040-6_29) for vehicle classification on [Vehicle-X](https://github.com/yorkeyao/VehicleX) dataset [(Yao *et al.*, 2020)](https://link.springer.com/chapter/10.1007/978-3-030-58539-6_46).
 
 ## Prerequisites
