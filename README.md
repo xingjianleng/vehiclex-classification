@@ -1,5 +1,5 @@
-# vehicle-x-classification
-Implementing Constructive Cascade Network technique [(Khoo *et al*., 2009)](https://link.springer.com/chapter/10.1007/978-3-642-03040-6_29) for vehicle classification on [Vehicle-X](https://github.com/yorkeyao/VehicleX) dataset [(Yao *et al.*, 2020)](https://link.springer.com/chapter/10.1007/978-3-030-58539-6_46).
+# vehiclex-classification
+Implementing Constructive Cascade Network technique [(Khoo *et al*., 2009)](https://link.springer.com/chapter/10.1007/978-3-642-03040-6_29) for vehicle classification on [VehicleX](https://github.com/yorkeyao/VehicleX) dataset [(Yao *et al.*, 2020)](https://link.springer.com/chapter/10.1007/978-3-030-58539-6_46).
 
 ## Prerequisites
 To run the code, the machine **MUST** have at least one GPU with CUDA support. The code has been tested on Ubuntu 18.04.3 with Python 3.8.17 and CUDA 11.6.
