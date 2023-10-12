@@ -1,0 +1,14 @@
+{
+    "logdir": "./logs/baseline/",
+    "nas": 0,
+    "configs": [
+        ["--model", "resnet50", "--pretrained", "--tr_batch_size", "64", "--lr", "5e-4", "--scheduler"],
+        ["--model", "resnet50", "--pretrained", "--tr_batch_size", "64", "--lr", "5e-4"],
+        ["--model", "resnet50", "--pretrained", "--tr_batch_size", "64", "--lr", "1e-4", "--scheduler"],
+        ["--model", "resnet50", "--tr_batch_size", "64", "--lr", "5e-4", "--scheduler"],
+        ["--model", "vit_small_patch16_224", "--pretrained", "--tr_batch_size", "64", "--lr", "1e-4", "--scheduler"],
+        ["--model", "vit_small_patch16_224", "--pretrained", "--tr_batch_size", "64", "--lr", "1e-4"],
+        ["--model", "vit_small_patch16_224", "--pretrained", "--tr_batch_size", "64", "--lr", "5e-4", "--scheduler"],
+        ["--model", "vit_small_patch16_224", "--tr_batch_size", "64", "--lr", "1e-4", "--scheduler"]
+    ]
+}

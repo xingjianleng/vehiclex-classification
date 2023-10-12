@@ -1,0 +1,5 @@
+working/
+logs/
+out/
+**/__pycache__/
+**/.vscode/
