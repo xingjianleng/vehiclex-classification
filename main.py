@@ -170,7 +170,7 @@ if __name__ == '__main__':
     parser.add_argument('--eval', action='store_true', help='evaluation mode')
     parser.add_argument('--logdir', type=str, default='./logs/', help='log directory')
     parser.add_argument('--log_interval', type=int, default=200, help='interval of epochs of taking the log')
-    parser.add_argument('--early_stop', type=int, default=5, help='early stop')
+    parser.add_argument('--early_stop', type=int, default=10, help='early stop')
     parser.add_argument('--seed', type=int, default=42, help='random seed')
 
     args = parser.parse_args()
