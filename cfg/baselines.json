@@ -2,11 +2,11 @@
     "logdir": "./logs/baseline/",
     "nas": 0,
     "configs": [
-        ["--model", "resnet50", "-e", "100", "-b", "64", "--lr", "1e-3", "--scheduler"],
         ["--model", "resnet50", "-e", "150", "-b", "64", "--lr", "1e-3", "--scheduler"],
-        ["--model", "resnet50", "-e", "100", "-b", "64", "--lr", "5e-3", "--scheduler"],
-        ["--model", "resnet50", "-e", "100", "-b", "64", "--lr", "1e-3"],
-        ["--model", "resnet50", "--optim", "sgd", "-e", "100", "-b", "64", "--lr", "1e-3", "--scheduler"],
-        ["--model", "vgg19_bn.tv_in1k", "-e", "100", "-b", "32", "--lr", "1e-3", "--scheduler"]
+        ["--model", "resnet50", "-e", "100", "-b", "64", "--lr", "1e-3", "--scheduler"],
+        ["--model", "resnet50", "-e", "150", "-b", "64", "--lr", "5e-3", "--scheduler"],
+        ["--model", "resnet50", "-e", "150", "-b", "64", "--lr", "1e-3"],
+        ["--model", "resnet50", "--optim", "sgd", "-e", "150", "-b", "64", "--lr", "1e-3", "--scheduler"],
+        ["--model", "vgg19_bn.tv_in1k", "-e", "150", "-b", "32", "--lr", "1e-3", "--scheduler"]
     ]
 }
