@@ -18,6 +18,7 @@ def extract_info_from_refined_string(s):
     d['batch_size'] = int(re.search('_b(\d+)', s).group(1))
     d['epochs'] = int(re.search('_e(\d+)', s).group(1))
     d['weight_decay'] = float(re.search('_wd([\d.]+)', s).group(1))
+    d['early_stop'] = int(re.search('_es(\d+)_seed', s).group(1))
     d['optimizer'] = re.search('_optim(\w+)_model', s).group(1)
     d['scheduler'] = str2bool(re.search('_scheduler(\w+)_wd', s).group(1))
     d['model'] = re.search('_model(\w+)_scheduler', s).group(1)
