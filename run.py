@@ -21,7 +21,7 @@ def main(args):
     assert len(seeds) > 0, 'the script needs to use random seeds'
 
     # NOTE: gpu queue, change according to your setup
-    gpu_ids = [0, 1, 3]
+    gpu_ids = [0, 1, 2, 3]
     worker_queue = queue.Queue()
     for id in gpu_ids:
         worker_queue.put(id)
@@ -71,7 +71,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('main.py runner')
     parser.add_argument('--cfg_path', type=str, required=True, help='Path to config file')
-    parser.add_argument('--random_seeds', type=str, default='0,13,21,42,389', help='Random seeds to use, separated by commas')
+    parser.add_argument('--random_seeds', type=str, default='0,13,21', help='Random seeds to use, separated by commas')
     args = parser.parse_args()
 
     main(args)

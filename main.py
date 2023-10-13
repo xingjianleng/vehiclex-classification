@@ -133,7 +133,7 @@ if __name__ == '__main__':
     parser.add_argument('--base', type=str, default='~/Data/vehicle-x_v2/Classification Task/', help='dataset base directory')
     parser.add_argument('--num_classes', type=int, default=1362, help='number of classes')
     parser.add_argument('--num_workers', type=int, default=4, help='number of workers for data loading')
-    parser.add_argument('--tr_batch_size', type=int, default=64, help='train batch size')
+    parser.add_argument('--tr_batch_size', '-b', type=int, default=64, help='train batch size')
     parser.add_argument('--te_batch_size', type=int, default=128, help='test batch size')
     # model parameter
     parser.add_argument('--model', type=str, default='resnet50', help='model name')
@@ -141,7 +141,7 @@ if __name__ == '__main__':
     parser.add_argument('--nas', action='store_true', help='use neural architecture search (NAS)')
     # training parameter
     parser.add_argument('--lr', type=float, default=5e-4, help='learning rate')
-    parser.add_argument('--epochs', '-e', type=int, default=10, help='number of train epochs')
+    parser.add_argument('--epochs', '-e', type=int, default=100, help='number of train epochs')
     # optimizer parameter
     parser.add_argument('--optim', type=str, default='adam', help='optimizer',
                         choices=['adam', 'sgd'])
