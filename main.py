@@ -160,7 +160,7 @@ if __name__ == '__main__':
     parser.add_argument('--nas', action='store_true', help='use neural architecture search (NAS)')
     # training parameter
     parser.add_argument('--lr', type=float, default=1e-3, help='learning rate')
-    parser.add_argument('--epochs', '-e', type=int, default=100, help='number of train epochs')
+    parser.add_argument('--epochs', '-e', type=int, default=150, help='number of train epochs')
     # optimizer parameter
     parser.add_argument('--optim', type=str, default='adam', help='optimizer',
                         choices=['adam', 'sgd'])
