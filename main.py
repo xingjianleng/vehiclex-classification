@@ -59,7 +59,7 @@ def main(args):
     logdir = f'{args.logdir}{"DEBUG_" if is_debug else ""}{"NAS" if args.nas else "BASELINE"}_' \
              f'lr{args.lr}_b{args.tr_batch_size}_e{args.epochs}_' \
              f'optim{args.optim}_model{args.model}_scheduler{args.scheduler}' \
-             f'_wd{args.weight_decay}_es{args.early_stop}_seed{args.seed}_pretrained{args.pretrained}_' \
+             f'_wd{args.weight_decay}_seed{args.seed}_pretrained{args.pretrained}_' \
              f'{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}' if not args.eval \
         else f'{args.logdir}{args.dataset}/EVAL_{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}'
     os.makedirs(logdir, exist_ok=True)
@@ -101,10 +101,6 @@ def main(args):
     val_loss_s = []
     val_acc_s = []
 
-    # early stop and best acc record
-    best_acc = 0
-    early_stop = 0
-
     # learning
     if not args.eval:
         for epoch in tqdm.tqdm(range(1, args.epochs + 1)):
@@ -120,22 +116,6 @@ def main(args):
             val_acc_s.append(val_acc)
             draw_curve(os.path.join(logdir, 'learning_curve.jpg'), x_epoch, train_loss_s, val_loss_s,
                         train_acc_s, val_acc_s)
-
-            # early stop
-            if val_acc > best_acc:
-                best_acc = val_acc
-                early_stop = 0
-                # only save the best model
-                torch.save(model.state_dict(), os.path.join(logdir, 'model_best.pth'))
-            else:
-                early_stop += 1
-            if early_stop >= args.early_stop:
-                print('Early stop!')
-                break
-
-        # load best model for testing
-        print(f'Finished training, loading best model for testing, best acc: {best_acc:.6f}')
-        model.load_state_dict(torch.load(os.path.join(logdir, 'model_best.pth')))
 
     print('Test loaded model...')
     print(logdir)
@@ -170,7 +150,6 @@ if __name__ == '__main__':
     parser.add_argument('--eval', action='store_true', help='evaluation mode')
     parser.add_argument('--logdir', type=str, default='./logs/', help='log directory')
     parser.add_argument('--log_interval', type=int, default=200, help='interval of epochs of taking the log')
-    parser.add_argument('--early_stop', type=int, default=10, help='early stop')
     parser.add_argument('--seed', type=int, default=42, help='random seed')
 
     args = parser.parse_args()
