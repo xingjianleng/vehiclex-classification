@@ -7,3 +7,8 @@ def str2bool(v):
         return False
     else:
         raise ValueError('Boolean value expected')
+
+def float_or_none(value):
+    if value.lower() == 'none':
+        return None
+    return float(value)

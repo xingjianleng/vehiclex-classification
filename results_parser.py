@@ -7,7 +7,7 @@ import hashlib
 import numpy as np
 import pandas as pd
 
-from src.utils.str2bool import str2bool
+from utils.argparse_type import str2bool
 
 
 def extract_info_from_refined_string(s):
