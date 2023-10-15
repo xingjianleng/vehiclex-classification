@@ -1,4 +1,3 @@
-import torch.optim as optim
 from nni.nas.evaluator.pytorch import Classification
 from nni.nas.experiment import NasExperiment
 from nni.nas.hub.pytorch import DARTS as DartsSpace

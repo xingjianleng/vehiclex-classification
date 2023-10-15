@@ -1,6 +1,5 @@
 import json
 
-import torch.optim as optim
 from nni.nas.evaluator.pytorch import Classification
 from nni.nas.hub.pytorch import DARTS as DartsSpace
 from nni.nas.nn.pytorch import MutableLinear

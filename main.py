@@ -19,14 +19,13 @@ from src.trainer import NetworkTrainer
 from src.datasets.vehicle_x import Vehicle_X
 from src.models.timm_wrapper import get_model
 from src.nas.search import darts_search
-from src.nas.retrain import retrain_model
+from src.nas.retrain import make_model
 from src.utils.argparse_type import float_or_none
 from src.utils.draw_curve import draw_curve
-from src.utils.eval import evaluate_model
 from src.utils.logger import Logger
 
 
-def prepare_nni_dataloader(base, bs, num_workers):
+def get_standard_transforms():
     # transforms
     train_transform = T.Compose([
         T.RandomResizedCrop(224),
@@ -39,6 +38,11 @@ def prepare_nni_dataloader(base, bs, num_workers):
         T.ToTensor(),
         T.Normalize([0.4850, 0.4560, 0.4060], [0.2290, 0.2240, 0.2250]),
     ])
+    return train_transform, test_transform
+
+
+def prepare_nni_dataloader(base, bs, num_workers):
+    train_transform, test_transform = get_standard_transforms()
 
     # datasets and dataloaders
     train_data = nni.trace(Vehicle_X)(
@@ -63,6 +67,18 @@ def prepare_nni_dataloader(base, bs, num_workers):
     return train_loader, val_loader, test_loader
 
 
+def prepare_normal_dataloader(base, bs, num_workers, train_transform, test_transform):
+    # datasets and dataloaders
+    train_set = Vehicle_X(os.path.expanduser(os.path.join(base, 'train')), transform=train_transform)
+    val_set = Vehicle_X(os.path.expanduser(os.path.join(base, 'val')), transform=test_transform)
+    test_set = Vehicle_X(os.path.expanduser(os.path.join(base, 'test')), transform=test_transform)
+
+    train_loader = DataLoader(train_set, batch_size=bs, shuffle=True, num_workers=num_workers)
+    val_loader = DataLoader(val_set, batch_size=bs, shuffle=False, num_workers=num_workers)
+    test_loader = DataLoader(test_set, batch_size=bs, shuffle=False, num_workers=num_workers)
+    return train_loader, val_loader, test_loader
+
+
 def copy_script(logdir):
     os.makedirs(logdir, exist_ok=True)
     copy_tree('src', logdir + '/scripts/src')
@@ -76,79 +92,7 @@ def copy_script(logdir):
     print(vars(args))
 
 
-def nas_search_main(args):
-    if args.eval:
-        raise NotImplementedError('Evaluation mode not implemented for NAS search')
-    
-    logdir = f'{args.logdir}{"DEBUG_" if is_debug else ""}NASsearch_' \
-             f'lr{args.search_lr}_b{args.tr_batch_size}_e{args.search_epochs}_' \
-             f'optim{args.search_optim}_width{args.search_width}' \
-             f'_cell{args.search_num_cells}_wd{args.search_weight_decay}_' \
-             f'{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}'
-    copy_script(logdir)
-
-    train_loader, val_loader, _ = prepare_nni_dataloader(args.base, args.search_batch_size, args.num_workers)
-
-    print(f'Start searching...')
-    exported_arch = darts_search(train_loader, val_loader, args)
-    with open(os.path.join(logdir, 'exported_arch.json'), 'w') as fp:
-        json.dump(exported_arch, fp)
-    print(f'Searching finished...')
-
-
-def nas_training_main(args):
-    if args.eval:
-        raise NotImplementedError('Evaluation mode not implemented for NAS retrain')
-
-    train_loader, val_loader, test_loader = prepare_nni_dataloader(args.base, args.retrain_batch_size, args.num_workers)
-
-    logdir = f'{args.logdir}{"DEBUG_" if is_debug else ""}NASretrain_' \
-             f'lr{args.retrain_lr}_b{args.tr_batch_size}_e{args.retrain_epochs}_' \
-             f'optim{args.retrain_optim}_width{args.retrain_width}' \
-             f'_cell{args.retrain_num_cells}_wd{args.retrain_weight_decay}_' \
-             f'{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}'
-    copy_script(logdir)
-
-    model = retrain_model(train_loader, val_loader, args)
-    model.cuda()
-
-    test_results = evaluate_model(model, test_loader)
-    with open(os.path.join(logdir, 'test_results.txt'), 'w') as f:
-        for test_result in test_results:
-            f.write(f'{test_result:.6f}\n')
-
-
-def baseline_main(args):
-    # get models and transformations from timm, and transfer to GPU
-    model, train_transform, test_transform = get_model(args.model, args.num_classes, pretrained=args.pretrained)
-    model.cuda()
-
-    # datasets and dataloaders
-    train_set = Vehicle_X(os.path.expanduser(os.path.join(args.base, 'train')), transform=train_transform)
-    val_set = Vehicle_X(os.path.expanduser(os.path.join(args.base, 'val')), transform=test_transform)
-    test_set = Vehicle_X(os.path.expanduser(os.path.join(args.base, 'test')), transform=test_transform)
-
-    train_loader = DataLoader(train_set, batch_size=args.tr_batch_size, shuffle=True, num_workers=args.num_workers)
-    val_loader = DataLoader(val_set, batch_size=args.te_batch_size, shuffle=False, num_workers=args.num_workers)
-    test_loader = DataLoader(test_set, batch_size=args.te_batch_size, shuffle=False, num_workers=args.num_workers)
-
-    # optimizer
-    if args.optim == 'adam':
-        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-    elif args.optim == 'sgd':
-        optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-    else:
-        raise NotImplementedError(f'Optimizer {args.optim} not implemented')
-
-    # logging
-    logdir = f'{args.logdir}{"DEBUG_" if is_debug else ""}BASELINE_' \
-             f'lr{args.lr}_b{args.tr_batch_size}_e{args.epochs}_' \
-             f'optim{args.optim}_model{args.model}_scheduler{args.scheduler}' \
-             f'_wd{args.weight_decay}_seed{args.seed}_pretrained{args.pretrained}_' \
-             f'{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}' if not args.eval \
-        else f'{args.logdir}{args.dataset}/EVAL_{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}'
-    copy_script(logdir)
-
+def train_test_model(model, train_loader, val_loader, test_loader, optimizer, logdir, args):
     # tensorboard logging
     writer = SummaryWriter(logdir)
     writer.add_text("hyperparameters",
@@ -202,6 +146,85 @@ def baseline_main(args):
     writer.close()
 
 
+def nas_search_main(args):
+    if args.eval:
+        raise NotImplementedError('Evaluation mode not implemented for NAS search')
+    
+    logdir = f'{args.logdir}{"DEBUG_" if is_debug else ""}NASsearch_' \
+             f'lr{args.search_lr}_b{args.search_batch_size}_e{args.search_epochs}_' \
+             f'optim{args.search_optim}_width{args.search_width}' \
+             f'_cell{args.search_num_cells}_wd{args.search_weight_decay}_' \
+             f'{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}'
+    copy_script(logdir)
+
+    train_loader, val_loader, _ = prepare_nni_dataloader(args.base, args.search_batch_size, args.num_workers)
+
+    print(f'Start searching...')
+    exported_arch = darts_search(train_loader, val_loader, args)
+    with open(os.path.join(logdir, 'exported_arch.json'), 'w') as fp:
+        json.dump(exported_arch, fp)
+    print(f'Searching finished...')
+
+
+def nas_training_main(args):
+    if args.eval:
+        raise NotImplementedError('Evaluation mode not implemented for NAS retrain')
+
+    train_transform, test_transform = get_standard_transforms()
+    train_loader, val_loader, test_loader = prepare_normal_dataloader(args.base, args.tr_batch_size, args.num_workers,
+                                                                      train_transform, test_transform)
+
+    logdir = f'{args.logdir}{"DEBUG_" if is_debug else ""}NASretrain_' \
+             f'lr{args.lr}_b{args.tr_batch_size}_e{args.epochs}_' \
+             f'optim{args.optim}_width{args.retrain_width}' \
+             f'_cell{args.retrain_num_cells}_wd{args.weight_decay}_' \
+             f'{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}'
+    copy_script(logdir)
+
+    model = make_model(args)
+    model.cuda()
+
+    # optimizer
+    if args.optim == 'adam':
+        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    elif args.optim == 'sgd':
+        optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    else:
+        raise NotImplementedError(f'Optimizer {args.optim} not implemented')
+    
+    # training
+    train_test_model(model, train_loader, val_loader, test_loader, optimizer, logdir, args)
+
+
+def baseline_main(args):
+    # get models and transformations from timm, and transfer to GPU
+    model, train_transform, test_transform = get_model(args.model, args.num_classes, pretrained=args.pretrained)
+    model.cuda()
+
+    train_loader, val_loader, test_loader = prepare_normal_dataloader(args.base, args.tr_batch_size, args.num_workers,
+                                                                        train_transform, test_transform)
+
+    # optimizer
+    if args.optim == 'adam':
+        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    elif args.optim == 'sgd':
+        optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    else:
+        raise NotImplementedError(f'Optimizer {args.optim} not implemented')
+
+    # logging
+    logdir = f'{args.logdir}{"DEBUG_" if is_debug else ""}BASELINE_' \
+             f'lr{args.lr}_b{args.tr_batch_size}_e{args.epochs}_' \
+             f'optim{args.optim}_model{args.model}_scheduler{args.scheduler}' \
+             f'_wd{args.weight_decay}_seed{args.seed}_pretrained{args.pretrained}_' \
+             f'{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}' if not args.eval \
+        else f'{args.logdir}{args.dataset}/EVAL_{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}'
+    copy_script(logdir)
+
+    # training
+    train_test_model(model, train_loader, val_loader, test_loader, optimizer, logdir, args)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('Main experiment script')
     # dataset
@@ -228,21 +251,15 @@ if __name__ == '__main__':
     parser.add_argument('--search_lr', type=float, default=1e-3, help='learning rate for search')
     parser.add_argument('--search_weight_decay', type=float, default=1e-4, help='weight decay for search')
     parser.add_argument('--search_width', type=int, default=16, help='width of the network')
-    parser.add_argument('--search_num_cells', type=int, default=8, help='number of cells in the network')
+    parser.add_argument('--search_num_cells', type=int, default=10, help='number of cells in the network')
     parser.add_argument('--search_optim', type=str, default='adam', help='optimizer for search',
                         choices=['adam', 'sgd'])
     parser.add_argument('--search_grad_clip', type=float_or_none, default=5., help='gradient clipping')
     # nas training parameters
     parser.add_argument('--nas_retrain', action='store_true', help='retrain NAS model')
     parser.add_argument('--arch_path', type=str, default='./exported_arch.json', help='path to exported architecture')
-    parser.add_argument('--retrain_batch_size', type=int, default=64, help='batch size for retrain')
     parser.add_argument('--retrain_width', type=int, default=32, help='width of the network')
     parser.add_argument('--retrain_num_cells', type=int, default=20, help='number of cells in the network')
-    parser.add_argument('--retrain_lr', type=float, default=5e-3, help='learning rate for retrain')
-    parser.add_argument('--retrain_weight_decay', type=float, default=5e-4, help='weight decay for retrain')
-    parser.add_argument('--retrain_epochs', type=int, default=200, help='number of retrain epochs')
-    parser.add_argument('--retrain_optim', type=str, default='adam', help='optimizer for retrain',
-                        choices=['adam', 'sgd'])
     # other parameters
     parser.add_argument('--eval', action='store_true', help='evaluation mode')
     parser.add_argument('--logdir', type=str, default='./logs/', help='log directory')
