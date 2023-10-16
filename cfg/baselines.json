@@ -6,7 +6,7 @@
         ["--model", "resnet50", "-e", "200", "-b", "64", "--lr", "1e-3", "--scheduler"],
         ["--model", "resnet50", "-e", "150", "-b", "64", "--lr", "5e-3", "--scheduler"],
         ["--model", "resnet50", "-e", "150", "-b", "64", "--lr", "1e-3"],
-        ["--model", "resnet50", "--optim", "sgd", "-e", "150", "-b", "64", "--lr", "1e-3", "--scheduler"],
-        ["--model", "vgg19_bn.tv_in1k", "-e", "150", "-b", "32", "--lr", "1e-3", "--scheduler"]
+        ["--model", "mobilenetv2_100", "-e", "150", "-b", "64", "--lr", "1e-3", "--scheduler"],
+        ["--model", "mobilenetv3_large_100", "-e", "150", "-b", "32", "--lr", "1e-3", "--scheduler"]
     ]
 }
