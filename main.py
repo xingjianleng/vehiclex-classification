@@ -3,6 +3,7 @@ import datetime
 from distutils.dir_util import copy_tree
 import json
 import os
+import random
 import shutil
 import sys
 
@@ -170,6 +171,14 @@ def nas_search_main(args):
 def nas_training_main(args):
     if args.eval:
         raise NotImplementedError('Evaluation mode not implemented for NAS retrain')
+    
+    # seed
+    if args.seed is not None:
+        random.seed(args.seed)
+        np.random.seed(args.seed)
+        torch.manual_seed(args.seed)
+        torch.cuda.manual_seed(args.seed)
+        torch.cuda.manual_seed_all(args.seed)
 
     train_transform, test_transform = get_standard_transforms()
     train_loader, val_loader, test_loader = prepare_normal_dataloader(args.base, args.tr_batch_size, args.num_workers,
@@ -198,6 +207,14 @@ def nas_training_main(args):
 
 
 def baseline_main(args):
+    # seed
+    if args.seed is not None:
+        random.seed(args.seed)
+        np.random.seed(args.seed)
+        torch.manual_seed(args.seed)
+        torch.cuda.manual_seed(args.seed)
+        torch.cuda.manual_seed_all(args.seed)
+
     # get models and transformations from timm, and transfer to GPU
     model, train_transform, test_transform = get_model(args.model, args.num_classes, pretrained=args.pretrained)
     model.cuda()
