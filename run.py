@@ -1,3 +1,6 @@
+'''
+This script is used to run multiple **training** experiments in parallel, not for NAS search experiments.
+'''
 import argparse
 import json
 import os
@@ -31,7 +34,7 @@ def main(args):
 
     for config in configs:
         if nas:
-            arguments = ['main.py', '--nas', '--logdir', logdir]
+            arguments = ['main.py', '--nas_retrain', '--logdir', logdir]
         else:
             arguments = ['main.py', '--logdir', logdir]
         arguments.extend(config)

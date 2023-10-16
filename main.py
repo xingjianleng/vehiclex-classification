@@ -136,6 +136,7 @@ def train_test_model(model, train_loader, val_loader, test_loader, optimizer, lo
             val_acc_s.append(val_acc)
             draw_curve(os.path.join(logdir, 'learning_curve.jpg'), x_epoch, train_loss_s, val_loss_s,
                         train_acc_s, val_acc_s)
+            torch.save(model.state_dict(), os.path.join(logdir, 'model.pth'))
 
     print('Test loaded model...')
     print(logdir)
@@ -177,7 +178,7 @@ def nas_training_main(args):
     logdir = f'{args.logdir}{"DEBUG_" if is_debug else ""}NASretrain_' \
              f'lr{args.lr}_b{args.tr_batch_size}_e{args.epochs}_' \
              f'optim{args.optim}_width{args.retrain_width}' \
-             f'_cell{args.retrain_num_cells}_wd{args.weight_decay}_' \
+             f'_cell{args.retrain_num_cells}_scheduler{args.scheduler}_wd{args.weight_decay}_seed{args.seed}_' \
              f'{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}'
     copy_script(logdir)
 
@@ -251,7 +252,7 @@ if __name__ == '__main__':
     parser.add_argument('--search_lr', type=float, default=1e-3, help='learning rate for search')
     parser.add_argument('--search_weight_decay', type=float, default=1e-4, help='weight decay for search')
     parser.add_argument('--search_width', type=int, default=16, help='width of the network')
-    parser.add_argument('--search_num_cells', type=int, default=10, help='number of cells in the network')
+    parser.add_argument('--search_num_cells', type=int, default=8, help='number of cells in the network')
     parser.add_argument('--search_optim', type=str, default='adam', help='optimizer for search',
                         choices=['adam', 'sgd'])
     parser.add_argument('--search_grad_clip', type=float_or_none, default=5., help='gradient clipping')
