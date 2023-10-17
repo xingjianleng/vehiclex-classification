@@ -3,6 +3,7 @@ from sklearn.metrics import precision_recall_fscore_support
 
 
 def evaluate_model(model, test_loader):
+    # helper function to evaluate a model on a given dataset
     preds, labels = [], []
     model.eval()
     with torch.no_grad():

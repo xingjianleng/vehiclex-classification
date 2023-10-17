@@ -5,6 +5,7 @@ from torchvision.datasets import VisionDataset
 
 
 class Vehicle_X(VisionDataset):
+    # dataset class for vehicle-x, which is responsible for loading images and labels
     def __init__(self, root, transform=None, target_transform=None):
         super(Vehicle_X, self).__init__(root, transform=transform, target_transform=target_transform)
         self.transform = transform

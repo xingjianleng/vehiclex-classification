@@ -1,3 +1,6 @@
+'''
+Code is useful when users download the dataset from the official website.
+'''
 import argparse
 import json
 import os

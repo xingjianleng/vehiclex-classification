@@ -7,6 +7,7 @@ import torch.nn.functional as F
 
 
 class NetworkTrainer(object):
+    # a wrapper class for training and testing a model
     def __init__(self, model, logdir, writer, args):
         self.model = model
         self.args = args
@@ -43,6 +44,7 @@ class NetworkTrainer(object):
             preds.append(pred.detach().cpu().numpy())
             tgts.append(target.detach().cpu().numpy())
 
+            # step scheduler to update learning rate if we are using one
             if scheduler is not None:
                 if isinstance(scheduler, torch.optim.lr_scheduler.OneCycleLR):
                     scheduler.step()
@@ -57,6 +59,7 @@ class NetworkTrainer(object):
                 print(f'Train epoch: {epoch}, batch:{(batch_idx + 1)}, '
                       f'loss: {losses / (batch_idx + 1):.3f}, time: {t_epoch:.1f}')
 
+        # calculate average loss and accuracy over all training batches
         train_loss = losses / len(dataloader)
         train_acc = correct / len(dataloader.dataset) * 100
         precision, recall, f1, _ = precision_recall_fscore_support(np.concatenate(tgts), np.concatenate(preds), average='macro',
@@ -65,6 +68,7 @@ class NetworkTrainer(object):
         recall *= 100
         f1 *= 100    
     
+        # log training results to tensorboard
         self.writer.add_scalar("charts/train_loss", train_loss, epoch)
         self.writer.add_scalar("charts/train_acc", train_acc, epoch)
         self.writer.add_scalar("charts/train_precision", precision, epoch)
@@ -72,7 +76,7 @@ class NetworkTrainer(object):
         self.writer.add_scalar("charts/train_f1", f1, epoch)
         self.writer.add_scalar("charts/lr", optimizer.param_groups[0]['lr'], epoch)
 
-        # print training time
+        # print training time and metrics on training set
         t1 = time.time()
         print(f'Train loss: {train_loss:.6f}, Accuracy: {train_acc:.4f}%, '
               f'precision: {precision:.4f}%, recall: {recall:.4f}%, f1: {f1:.4f}%')
@@ -104,6 +108,7 @@ class NetworkTrainer(object):
                 preds.append(pred.detach().cpu().numpy())
                 tgts.append(target.detach().cpu().numpy())
 
+        # calculate average loss and accuracy over all test batches
         test_loss /= len(dataloader)
         test_acc = correct / len(dataloader.dataset) * 100
         precision, recall, f1, _ = precision_recall_fscore_support(np.concatenate(tgts), np.concatenate(preds), average='macro',
@@ -112,6 +117,7 @@ class NetworkTrainer(object):
         recall *= 100
         f1 *= 100
 
+        # if epoch is not None, then this is a validation test
         if epoch:
             self.writer.add_scalar("charts/val_loss", test_loss / len(dataloader), epoch)
             self.writer.add_scalar("charts/val_acc", test_acc, epoch)
@@ -120,7 +126,6 @@ class NetworkTrainer(object):
             self.writer.add_scalar("charts/val_f1", f1, epoch)
 
         # print test results
-        
         print(f'\n{"Val" if epoch else "Test"} set: Average loss: {test_loss:.6f}, Accuracy: {test_acc:.4f}%, '
                 f'Precision: {precision:.4f}%, Recall: {recall:.4f}%, F1: {f1:.4f}%\n')
         return test_loss, test_acc, precision, recall, f1

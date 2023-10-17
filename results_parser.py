@@ -27,11 +27,13 @@ def extract_info_from_refined_string(s):
 
 
 def hash_hyper(d):
+    # Hash hyperparameters to a unique value
     encoded_dict = json.dumps(d, sort_keys=True).encode('utf-8')
     return hashlib.md5(encoded_dict).hexdigest()
 
 
 def extract_results(fp):
+    # Extract results from the test_results.txt file
     return list(map(float, fp.read().split('\n')[:-1]))
 
 
@@ -63,7 +65,7 @@ def main(args):
             hash_to_results[hash]['rec'].append(result[2])
             hash_to_results[hash]['f1'].append(result[3])
 
-    # create table with average results
+    # create table with average results and standard deviation
     for hash, results in hash_to_results.items():
         hyper = hash_to_hyper[hash]
         tbl = pd.DataFrame(results)
@@ -92,6 +94,7 @@ def main(args):
         hyper = hash_to_hyper[list(hash_to_hyper.keys())[idx_sorted[i]]]
         hypers.append(hyper)
 
+    # save hyperparameters as a json file
     with open(os.path.join(outdir, f'configs.json'), 'w') as fp:
         json.dump(hypers, fp, indent=4)
 

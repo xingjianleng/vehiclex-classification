@@ -10,7 +10,7 @@ from src.datasets.vehicle_x import Vehicle_X
 
 
 if __name__ == '__main__':
-    # transformations
+    # load datasets
     train_set = Vehicle_X(os.path.expanduser('~/Data/vehicle-x_v2/Classification Task/train'))
     val_set = Vehicle_X(os.path.expanduser('~/Data/vehicle-x_v2/Classification Task/val'))
     test_set = Vehicle_X(os.path.expanduser('~/Data/vehicle-x_v2/Classification Task/test'))
@@ -18,6 +18,7 @@ if __name__ == '__main__':
     if not os.path.exists('./logs/'):
         os.makedirs('./logs/')
 
+    # plot the distribution of the labels
     plt.figure()
     sns.countplot(x=train_set.labels, palette='hls')
     plt.xticks([])
@@ -39,10 +40,12 @@ if __name__ == '__main__':
     plt.tight_layout()
     plt.savefig('logs/test_dist.pdf')
 
+    # compute the statistics of the label distribution
     train_counter = Counter(train_set.labels)
     val_counter = Counter(val_set.labels)
     test_counter = Counter(test_set.labels)
 
+    # save the statistics
     with open('logs/label_dist.txt', 'w') as fp:
         fp.write('Train set:\n')
         label_counts = np.array(list(train_counter.values()))

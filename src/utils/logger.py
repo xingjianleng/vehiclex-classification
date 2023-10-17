@@ -3,6 +3,7 @@ import sys
 
 
 class Logger(object):
+    # https://stackoverflow.com/questions/14906764/how-to-redirect-stdout-to-both-file-and-console-with-scripting
     def __init__(self, fpath=None):
         self.console = sys.stdout
         self.file = None

@@ -8,12 +8,16 @@ from src.nas.retrain import make_model
 
 
 def main(args):
+    # this script is used to compute the FLOPs and params of the model
     if args.is_timm:
+        # evaluate the model from timm
         model = timm.create_model(args.model, num_classes=args.num_classes, pretrained=False)
         print(f'{args.model} from timm')
     else:
+        # evaluate the model from neural architecture search results
         model = make_model(args)
         print('model from exported architecture')
+    # compute the FLOPs and params
     img = torch.randn(1, 3, 224, 224)
     flops, params = thop.profile(model, inputs=(img, ))
     flops, params = thop.clever_format([flops, params], '%.3f')

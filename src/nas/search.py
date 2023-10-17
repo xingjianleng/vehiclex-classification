@@ -19,8 +19,10 @@ def darts_search(train_loader, valid_loader, args):
     model_space.num_labels = args.num_classes
     model_space.classifier = MutableLinear(model_space.classifier.in_features, model_space.num_labels)
 
+    # decide the optimizer to use
     optimizer = get_optim(args)
 
+    # initialize the classification task evaluator and fit the model
     evaluator = Classification(
         learning_rate=args.search_lr,
         weight_decay=args.search_weight_decay,
@@ -32,10 +34,13 @@ def darts_search(train_loader, valid_loader, args):
         export_onnx=False
     )
 
+    # we use the default strategy for DARTS, but we enable gradient clipping to stabilize training
     strategy = DartsStrategy(gradient_clip_val=args.search_grad_clip)
 
+    # initialize the NAS experiment and run it
     experiment = NasExperiment(model_space, evaluator, strategy)
     experiment.run()
 
+    # return the only the best architecture found
     exported_arch = experiment.export_top_models(formatter='dict')[0]
     return exported_arch

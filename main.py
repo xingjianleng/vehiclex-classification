@@ -27,7 +27,7 @@ from src.utils.logger import Logger
 
 
 def get_standard_transforms():
-    # transforms
+    # load transforms
     train_transform = T.Compose([
         T.RandomResizedCrop(224),
         T.RandomHorizontalFlip(),
@@ -43,9 +43,10 @@ def get_standard_transforms():
 
 
 def prepare_nni_dataloader(base, bs, num_workers):
+    # load transforms
     train_transform, test_transform = get_standard_transforms()
 
-    # datasets and dataloaders
+    # datasets and dataloaders, wrapped with nni tracers
     train_data = nni.trace(Vehicle_X)(
         root=os.path.expanduser(os.path.join(base, 'train')), transform=train_transform)
     val_data = nni.trace(Vehicle_X)(
@@ -53,6 +54,7 @@ def prepare_nni_dataloader(base, bs, num_workers):
     test_data = nni.trace(Vehicle_X)(
         root=os.path.expanduser(os.path.join(base, 'test')), transform=test_transform)
 
+    # use nni dataloaders instead of torch dataloaders
     train_loader = DataLoaderNNI(
         train_data, batch_size=bs, num_workers=num_workers
     )
@@ -69,7 +71,7 @@ def prepare_nni_dataloader(base, bs, num_workers):
 
 
 def prepare_normal_dataloader(base, bs, num_workers, train_transform, test_transform):
-    # datasets and dataloaders
+    # load datasets and dataloaders
     train_set = Vehicle_X(os.path.expanduser(os.path.join(base, 'train')), transform=train_transform)
     val_set = Vehicle_X(os.path.expanduser(os.path.join(base, 'val')), transform=test_transform)
     test_set = Vehicle_X(os.path.expanduser(os.path.join(base, 'test')), transform=test_transform)
@@ -81,6 +83,7 @@ def prepare_normal_dataloader(base, bs, num_workers, train_transform, test_trans
 
 
 def copy_script(logdir):
+    # copy script to logdir
     os.makedirs(logdir, exist_ok=True)
     copy_tree('src', logdir + '/scripts/src')
     for script in os.listdir('.'):
@@ -139,6 +142,7 @@ def train_test_model(model, train_loader, val_loader, test_loader, optimizer, lo
                         train_acc_s, val_acc_s)
             torch.save(model.state_dict(), os.path.join(logdir, 'model.pth'))
 
+    # testing
     print('Test loaded model...')
     print(logdir)
     test_results = trainer.test(test_loader)
@@ -152,6 +156,7 @@ def nas_search_main(args):
     if args.eval:
         raise NotImplementedError('Evaluation mode not implemented for NAS search')
     
+    # logging directory for nni search
     logdir = f'{args.logdir}{"DEBUG_" if is_debug else ""}NASsearch_' \
              f'lr{args.search_lr}_b{args.search_batch_size}_e{args.search_epochs}_' \
              f'optim{args.search_optim}_width{args.search_width}' \
@@ -159,8 +164,10 @@ def nas_search_main(args):
              f'{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}'
     copy_script(logdir)
 
+    # load data
     train_loader, val_loader, _ = prepare_nni_dataloader(args.base, args.search_batch_size, args.num_workers)
 
+    # searching
     print(f'Start searching...')
     exported_arch = darts_search(train_loader, val_loader, args)
     with open(os.path.join(logdir, 'exported_arch.json'), 'w') as fp:
@@ -168,11 +175,11 @@ def nas_search_main(args):
     print(f'Searching finished...')
 
 
-def nas_training_main(args):
+def nas_retraining_main(args):
     if args.eval:
         raise NotImplementedError('Evaluation mode not implemented for NAS retrain')
     
-    # seed
+    # seed during training
     if args.seed is not None:
         random.seed(args.seed)
         np.random.seed(args.seed)
@@ -180,10 +187,12 @@ def nas_training_main(args):
         torch.cuda.manual_seed(args.seed)
         torch.cuda.manual_seed_all(args.seed)
 
+    # load data
     train_transform, test_transform = get_standard_transforms()
     train_loader, val_loader, test_loader = prepare_normal_dataloader(args.base, args.tr_batch_size, args.num_workers,
                                                                       train_transform, test_transform)
 
+    # logging directory for nni retraining
     logdir = f'{args.logdir}{"DEBUG_" if is_debug else ""}NASretrain_' \
              f'lr{args.lr}_b{args.tr_batch_size}_e{args.epochs}_' \
              f'optim{args.optim}_width{args.retrain_width}' \
@@ -202,7 +211,7 @@ def nas_training_main(args):
     else:
         raise NotImplementedError(f'Optimizer {args.optim} not implemented')
     
-    # training
+    # training and testing
     train_test_model(model, train_loader, val_loader, test_loader, optimizer, logdir, args)
 
 
@@ -219,6 +228,7 @@ def baseline_main(args):
     model, train_transform, test_transform = get_model(args.model, args.num_classes, pretrained=args.pretrained)
     model.cuda()
 
+    # load data
     train_loader, val_loader, test_loader = prepare_normal_dataloader(args.base, args.tr_batch_size, args.num_workers,
                                                                         train_transform, test_transform)
 
@@ -230,7 +240,7 @@ def baseline_main(args):
     else:
         raise NotImplementedError(f'Optimizer {args.optim} not implemented')
 
-    # logging
+    # logging directory for baseline
     logdir = f'{args.logdir}{"DEBUG_" if is_debug else ""}BASELINE_' \
              f'lr{args.lr}_b{args.tr_batch_size}_e{args.epochs}_' \
              f'optim{args.optim}_model{args.model}_scheduler{args.scheduler}' \
@@ -239,7 +249,7 @@ def baseline_main(args):
         else f'{args.logdir}{args.dataset}/EVAL_{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}'
     copy_script(logdir)
 
-    # training
+    # training and testing
     train_test_model(model, train_loader, val_loader, test_loader, optimizer, logdir, args)
 
 
@@ -299,6 +309,6 @@ if __name__ == '__main__':
     if args.nas_search:
         nas_search_main(args)
     elif args.nas_retrain:
-        nas_training_main(args)
+        nas_retraining_main(args)
     else:
         baseline_main(args)

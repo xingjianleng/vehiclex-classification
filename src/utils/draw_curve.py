@@ -3,6 +3,7 @@ import seaborn as sns
 
 
 def draw_curve(path, x_epoch, train_loss, test_loss, train_result, test_result):
+    # draw curve for loss and result during training and testing iterations
     fig, ax = plt.subplots(1, 2, figsize=(12, 8))
 
     sns.lineplot(x=x_epoch, y=train_loss, ax=ax[0], color='blue', marker='o', label='train' + ': {:.3f}'.format(train_loss[-1]))

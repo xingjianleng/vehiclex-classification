@@ -55,6 +55,7 @@ def main(args):
                 time.sleep(1)
                 continue
 
+        # Start a new process
         worker_id = worker_queue.get()
         script_arg = script_arg_queue.get()
 
