@@ -1,0 +1,10 @@
+{
+    "logdir": "./logs/darts_b/",
+    "nas": 1,
+    "configs": [
+        ["--arch_path", "./logs/darts_b/NASsearch_lr0.001_b64_e100_optimadam_width16_cell8_wd0.0001_2023-10-16_21-57-00/exported_arch.json", "-e", "250", "-b", "128", "--lr", "1e-3", "--scheduler"],
+        ["--arch_path", "./logs/darts_b/NASsearch_lr0.001_b64_e100_optimadam_width16_cell8_wd0.0001_2023-10-16_21-57-00/exported_arch.json", "-e", "150", "-b", "128", "--lr", "1e-3", "--scheduler"],
+        ["--arch_path", "./logs/darts_b/NASsearch_lr0.001_b64_e100_optimadam_width16_cell8_wd0.0001_2023-10-16_21-57-00/exported_arch.json", "-e", "250", "-b", "128", "--lr", "5e-3", "--scheduler"],
+        ["--arch_path", "./logs/darts_b/NASsearch_lr0.001_b64_e100_optimadam_width16_cell8_wd0.0001_2023-10-16_21-57-00/exported_arch.json", "-e", "250", "-b", "128", "--lr", "1e-3"]
+    ]
+}

@@ -3,9 +3,7 @@
     "nas": 0,
     "configs": [
         ["--model", "mobilenetv2_100", "-e", "150", "-b", "64", "--lr", "1e-3", "--scheduler"],
-        ["--model", "mobilenetv2_100", "-e", "200", "-b", "64", "--lr", "1e-3", "--scheduler"],
-        ["--model", "mobilenetv2_100", "-e", "150", "-b", "64", "--lr", "5e-3", "--scheduler"],
-        ["--model", "mobilenetv2_100", "-e", "150", "-b", "64", "--lr", "1e-3"],
+        ["--model", "", "-e", "150", "-b", "64", "--lr", "1e-3", "--scheduler"],
         ["--model", "mobilenetv3_large_100", "-e", "150", "-b", "64", "--lr", "1e-3", "--scheduler"],
         ["--model", "resnet34", "-e", "150", "-b", "64", "--lr", "1e-3", "--scheduler"]
     ]
