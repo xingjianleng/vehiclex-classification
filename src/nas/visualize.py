@@ -55,8 +55,14 @@ if __name__ == '__main__':
     parser.add_argument('--debug', action='store_true')
     args = parser.parse_args()
 
+    # load the exported architecture
     with open(args.arch_path, 'r') as f:
         exported_arch = json.load(f)
 
+    # create the save path
+    if not os.path.exists(args.save_path):
+        os.makedirs(args.save_path)
+
+    # plot the normal cell and the reduce cell
     plot_single_cell(exported_arch, 'normal', os.path.join(args.save_path, 'normal_cell'), args.debug)
     plot_single_cell(exported_arch, 'reduce', os.path.join(args.save_path, 'reduce_cell'), args.debug)
