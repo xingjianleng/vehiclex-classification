@@ -4,7 +4,7 @@
     "configs": [
         ["--model", "mobilenetv2_100", "-e", "150", "-b", "64", "--lr", "1e-3", "--scheduler"],
         ["--model", "mobilenetv3_large_100", "-e", "150", "-b", "64", "--lr", "1e-3", "--scheduler"],
-        ["--model", "inception_v4", "-e", "150", "-b", "64", "--lr", "1e-3", "--scheduler"],
+        ["--model", "mnasnet_100", "-e", "150", "-b", "64", "--lr", "1e-3", "--scheduler"],
         ["--model", "efficientnet_b0", "-e", "150", "-b", "64", "--lr", "1e-3", "--scheduler"],
         ["--model", "resnet34", "-e", "150", "-b", "64", "--lr", "1e-3", "--scheduler"]
     ]
