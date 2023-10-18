@@ -13,6 +13,9 @@ from src.utils.argparse_type import str2bool
 def extract_info_from_refined_string(s):
     d = {}
 
+    # Extract mode
+    nas_retrain = 'NASretrain' in s
+
     # Extract common hyperparameters
     d['learning_rate'] = float(re.search('lr([\d.]+)', s).group(1))
     d['batch_size'] = int(re.search('_b(\d+)', s).group(1))
@@ -20,8 +23,14 @@ def extract_info_from_refined_string(s):
     d['weight_decay'] = float(re.search('_wd([\d.]+)', s).group(1))
     d['optimizer'] = re.search('_optim(\w+)_model', s).group(1)
     d['scheduler'] = str2bool(re.search('_scheduler(\w+)_wd', s).group(1))
-    d['model'] = re.search('_model(\w+)_scheduler', s).group(1)
-    d['pretrained'] = str2bool(re.search('_pretrained(\w+)_', s).group(1))
+
+    # Extract model specific hyperparameters
+    if nas_retrain:
+        d['width'] = int(re.search('_width(\d+)_', s).group(1))
+        d['cell'] = int(re.search('_cell(\d+)_', s).group(1))
+    else:
+        d['model'] = re.search('_model(\w+)_scheduler', s).group(1)
+        d['pretrained'] = str2bool(re.search('_pretrained(\w+)_', s).group(1))
 
     return hash_hyper(d), d
 
@@ -38,8 +47,7 @@ def extract_results(fp):
 
 
 def main(args):
-    logdir = os.path.join(args.logdir, args.partition)
-    logs = sorted(os.listdir(logdir))
+    logs = sorted(os.listdir(args.logdir))
 
     hash_to_hyper = {}
     hash_to_results = {}
@@ -58,7 +66,7 @@ def main(args):
                 'f1': [],
             }
             hash_to_results[hash] = result
-        with open(os.path.join(logdir, log, 'test_results.txt'), 'r') as fp:
+        with open(os.path.join(args.logdir, log, 'test_results.txt'), 'r') as fp:
             result = extract_results(fp)
             hash_to_results[hash]['acc'].append(result[0])
             hash_to_results[hash]['prec'].append(result[1])
@@ -103,7 +111,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser('Results parser')
     parser.add_argument('--logdir', type=str, default='./logs/')
     parser.add_argument('--outdir', type=str, default='./out/')
-    parser.add_argument('--partition', type=str, default='baseline')
 
     args = parser.parse_args()
     main(args)

@@ -11,10 +11,7 @@ import time
 
 def main(args):
     with open(args.cfg_path, 'r') as fp:
-        cfg = json.load(fp)
-        logdir = cfg['logdir']
-        nas = bool(cfg["nas"])
-        configs = cfg['configs']
+        configs = json.load(fp)
 
     # create a list of processes
     processes = []
@@ -33,11 +30,7 @@ def main(args):
     script_arg_queue = queue.Queue()
 
     for config in configs:
-        if nas:
-            arguments = ['main.py', '--nas_retrain', '--logdir', logdir]
-        else:
-            arguments = ['main.py', '--logdir', logdir]
-        arguments.extend(config)
+        arguments = ['main.py', *config]
         for seed in seeds:
             script_arg_queue.put(arguments + ['--seed', str(seed)])
 

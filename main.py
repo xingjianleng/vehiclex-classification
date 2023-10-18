@@ -178,14 +178,6 @@ def nas_search_main(args):
 def nas_retraining_main(args):
     if args.eval:
         raise NotImplementedError('Evaluation mode not implemented for NAS retrain')
-    
-    # seed during training
-    if args.seed is not None:
-        random.seed(args.seed)
-        np.random.seed(args.seed)
-        torch.manual_seed(args.seed)
-        torch.cuda.manual_seed(args.seed)
-        torch.cuda.manual_seed_all(args.seed)
 
     # load data
     train_transform, test_transform = get_standard_transforms()
@@ -216,14 +208,6 @@ def nas_retraining_main(args):
 
 
 def baseline_main(args):
-    # seed
-    if args.seed is not None:
-        random.seed(args.seed)
-        np.random.seed(args.seed)
-        torch.manual_seed(args.seed)
-        torch.cuda.manual_seed(args.seed)
-        torch.cuda.manual_seed_all(args.seed)
-
     # get models and transformations from timm, and transfer to GPU
     model, train_transform, test_transform = get_model(args.model, args.num_classes, pretrained=args.pretrained)
     model.cuda()
@@ -305,6 +289,14 @@ if __name__ == '__main__':
     else:
         print('No sys.gettrace')
         is_debug = False
+
+    # seed during training
+    if args.seed is not None:
+        random.seed(args.seed)
+        np.random.seed(args.seed)
+        torch.manual_seed(args.seed)
+        torch.cuda.manual_seed(args.seed)
+        torch.cuda.manual_seed_all(args.seed)
 
     if args.nas_search:
         nas_search_main(args)

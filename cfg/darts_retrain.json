@@ -1,0 +1,8 @@
+[
+    ["--logdir", "./logs/darts_a/", "--nas_retrain", "--arch_path", "./cfg/exported_arch_darts_a.json", "-e", "250", "-b", "128", "--lr", "1e-3", "--scheduler"],
+    ["--logdir", "./logs/darts_a/", "--nas_retrain", "--arch_path", "./cfg/exported_arch_darts_a.json", "-e", "250", "-b", "128", "--lr", "5e-3", "--scheduler"],
+    ["--logdir", "./logs/darts_a/", "--nas_retrain", "--arch_path", "./cfg/exported_arch_darts_a.json", "-e", "250", "-b", "128", "--lr", "1e-3"],
+    ["--logdir", "./logs/darts_b/", "--nas_retrain", "--arch_path", "./cfg/exported_arch_darts_b.json", "-e", "250", "-b", "128", "--lr", "1e-3", "--scheduler"],
+    ["--logdir", "./logs/darts_b/", "--nas_retrain", "--arch_path", "./cfg/exported_arch_darts_b.json", "-e", "250", "-b", "128", "--lr", "5e-3", "--scheduler"],
+    ["--logdir", "./logs/darts_b/", "--nas_retrain", "--arch_path", "./cfg/exported_arch_darts_b.json", "-e", "250", "-b", "128", "--lr", "1e-3"]
+]
