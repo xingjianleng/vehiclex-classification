@@ -83,9 +83,8 @@ def main(args):
         std_tbl = pd.concat([std_tbl, pd.DataFrame([std_row])], ignore_index=True)
 
     # create output directory
-    outdir = os.path.join(args.outdir, args.partition)
-    if not os.path.exists(outdir):
-        os.makedirs(outdir)
+    if not os.path.exists(args.outdir):
+        os.makedirs(args.outdir)
 
     # sort based on accuracy (descending)
     idx_sorted = np.argsort(avg_tbl['acc'].values)[::-1]
@@ -93,8 +92,8 @@ def main(args):
     std_tbl = std_tbl.iloc[idx_sorted].reset_index(drop=True)
 
     # save tables
-    avg_tbl.to_csv(os.path.join(outdir, f'average_metrics.csv'))
-    std_tbl.to_csv(os.path.join(outdir, f'std_metrics.csv'))
+    avg_tbl.to_csv(os.path.join(args.outdir, f'average_metrics.csv'))
+    std_tbl.to_csv(os.path.join(args.outdir, f'std_metrics.csv'))
 
     # save hyperparameters
     hypers = []
@@ -103,7 +102,7 @@ def main(args):
         hypers.append(hyper)
 
     # save hyperparameters as a json file
-    with open(os.path.join(outdir, f'configs.json'), 'w') as fp:
+    with open(os.path.join(args.outdir, f'configs.json'), 'w') as fp:
         json.dump(hypers, fp, indent=4)
 
 
