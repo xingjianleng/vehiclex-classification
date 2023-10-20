@@ -160,7 +160,7 @@ def nas_search_main(args):
     logdir = f'{args.logdir}{"DEBUG_" if is_debug else ""}NASsearch_' \
              f'lr{args.search_lr}_b{args.search_batch_size}_e{args.search_epochs}_' \
              f'optim{args.search_optim}_width{args.search_width}' \
-             f'_cell{args.search_num_cells}_wd{args.search_weight_decay}_' \
+             f'_cell{args.search_num_cells}_wd{args.search_weight_decay}_seed{args.seed}_' \
              f'{datetime.datetime.today():%Y-%m-%d_%H-%M-%S}'
     copy_script(logdir)
 
