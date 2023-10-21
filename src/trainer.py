@@ -119,7 +119,7 @@ class NetworkTrainer(object):
 
         # if epoch is not None, then this is a validation test
         if epoch:
-            self.writer.add_scalar("charts/val_loss", test_loss / len(dataloader), epoch)
+            self.writer.add_scalar("charts/val_loss", test_loss, epoch)
             self.writer.add_scalar("charts/val_acc", test_acc, epoch)
             self.writer.add_scalar("charts/val_precision", precision, epoch)
             self.writer.add_scalar("charts/val_recall", recall, epoch)
