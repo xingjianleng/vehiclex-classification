@@ -4,6 +4,7 @@ from nni.nas.evaluator.pytorch import Classification
 from nni.nas.hub.pytorch import DARTS as DartsSpace
 from nni.nas.nn.pytorch import MutableLinear
 from nni.nas.space import model_context
+from timm.models._efficientnet_builder import _init_weight_goog
 
 from src.utils.nas_optim import get_optim
 
@@ -24,6 +25,11 @@ def make_model(args):
     #       we manually change the number of classes here
     model.num_labels = args.num_classes
     model.classifier = MutableLinear(model.classifier.in_features, model.num_labels)
+
+    # model initialization: use google initialization
+    for n, m in model.named_modules():
+        _init_weight_goog(m, n)
+
     return model
 
 
