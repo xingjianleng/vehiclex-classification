@@ -55,16 +55,17 @@ def prepare_nni_dataloader(base, bs, num_workers):
         root=os.path.expanduser(os.path.join(base, 'test')), transform=test_transform)
 
     # use nni dataloaders instead of torch dataloaders
+    # val_loader is shuffled as it is used during NAS training
     train_loader = DataLoaderNNI(
-        train_data, batch_size=bs, num_workers=num_workers
+        train_data, batch_size=bs, num_workers=num_workers, shuffle=True
     )
 
     val_loader = DataLoaderNNI(
-        val_data, batch_size=bs, num_workers=num_workers
+        val_data, batch_size=bs, num_workers=num_workers, shuffle=True
     )
 
     test_loader = DataLoaderNNI(
-        test_data, batch_size=bs, num_workers=num_workers
+        test_data, batch_size=bs, num_workers=num_workers, shuffle=False
     )
 
     return train_loader, val_loader, test_loader
