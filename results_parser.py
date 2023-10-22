@@ -21,7 +21,6 @@ def extract_info_from_refined_string(s):
     d['batch_size'] = int(re.search('_b(\d+)', s).group(1))
     d['epochs'] = int(re.search('_e(\d+)', s).group(1))
     d['weight_decay'] = float(re.search('_wd([\d.]+)', s).group(1))
-    d['optimizer'] = re.search('_optim(\w+)_model', s).group(1)
     d['scheduler'] = str2bool(re.search('_scheduler(\w+)_wd', s).group(1))
 
     # Extract model specific hyperparameters
@@ -31,6 +30,7 @@ def extract_info_from_refined_string(s):
     else:
         d['model'] = re.search('_model(\w+)_scheduler', s).group(1)
         d['pretrained'] = str2bool(re.search('_pretrained(\w+)_', s).group(1))
+        d['optimizer'] = re.search('_optim(\w+)_model', s).group(1)
 
     return hash_hyper(d), d
 
@@ -47,7 +47,7 @@ def extract_results(fp):
 
 
 def main(args):
-    logs = sorted(os.listdir(args.logdir))
+    logs = [path for path in sorted(os.listdir(args.logdir)) if os.path.isdir(os.path.join(args.logdir, path))]
 
     hash_to_hyper = {}
     hash_to_results = {}
