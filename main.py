@@ -27,17 +27,17 @@ from src.utils.logger import Logger
 
 
 def get_standard_transforms():
-    # load transforms
+    # load transforms, mean is calculated from the vehicle-x training set
     train_transform = T.Compose([
         T.RandomResizedCrop(224),
         T.RandomHorizontalFlip(),
         T.ToTensor(),
-        T.Normalize([0.4850, 0.4560, 0.4060], [0.2290, 0.2240, 0.2250]),
+        T.Normalize([0.4425, 0.4380, 0.4332], [0.1858, 0.1812, 0.1795]),
     ])
     test_transform = T.Compose([
         T.Resize(224),
         T.ToTensor(),
-        T.Normalize([0.4850, 0.4560, 0.4060], [0.2290, 0.2240, 0.2250]),
+        T.Normalize([0.4425, 0.4380, 0.4332], [0.1858, 0.1812, 0.1795]),
     ])
     return train_transform, test_transform
 
