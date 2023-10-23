@@ -53,7 +53,7 @@ class DartsClassificationModule(ClassificationModule):
         self.model.set_drop_path_prob(self.model.drop_path_prob * self.current_epoch / self.max_epochs)
 
         # Logging learning rate at the beginning of every epoch
-        self.log('lr', self.trainer.optimizers[0].param_groups[0]['lr'])
+        self.log('lr', self.trainer.optimizers[0].param_groups[0]['lr'], sync_dist=True)
 
 
 def darts_search(train_loader, valid_loader, args):
