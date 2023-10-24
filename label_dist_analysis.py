@@ -20,21 +20,21 @@ if __name__ == '__main__':
 
     # plot the distribution of the labels
     plt.figure()
-    sns.countplot(x=train_set.labels, palette='hls')
+    sns.countplot(x=train_set.labels, hue=train_set.labels, palette='hls', legend=False)
     plt.xticks([])
     plt.xlabel('Class')
     plt.tight_layout()
     plt.savefig('logs/train_dist.pdf')
 
     plt.figure()
-    sns.countplot(x=val_set.labels, palette='hls')
+    sns.countplot(x=val_set.labels, hue=val_set.labels, palette='hls', legend=False)
     plt.xticks([])
     plt.xlabel('Class')
     plt.tight_layout()
     plt.savefig('logs/val_dist.pdf')
 
     plt.figure()
-    sns.countplot(x=test_set.labels, palette='hls')
+    sns.countplot(x=test_set.labels, hue=test_set.labels, palette='hls', legend=False)
     plt.xticks([])
     plt.xlabel('Class')
     plt.tight_layout()

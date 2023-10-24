@@ -47,7 +47,7 @@ def extract_results(fp):
 
 
 def main(args):
-    logs = [path for path in sorted(os.listdir(args.logdir)) if os.path.isdir(os.path.join(args.logdir, path))]
+    logs = [path for path in sorted(os.listdir(args.log_path)) if os.path.isdir(os.path.join(args.log_path, path))]
 
     hash_to_hyper = {}
     hash_to_results = {}
@@ -66,7 +66,7 @@ def main(args):
                 'f1': [],
             }
             hash_to_results[hash] = result
-        with open(os.path.join(args.logdir, log, 'test_results.txt'), 'r') as fp:
+        with open(os.path.join(args.log_path, log, 'test_results.txt'), 'r') as fp:
             result = extract_results(fp)
             hash_to_results[hash]['acc'].append(result[0])
             hash_to_results[hash]['prec'].append(result[1])
@@ -83,8 +83,8 @@ def main(args):
         std_tbl = pd.concat([std_tbl, pd.DataFrame([std_row])], ignore_index=True)
 
     # create output directory
-    if not os.path.exists(args.outdir):
-        os.makedirs(args.outdir)
+    if not os.path.exists(args.out_path):
+        os.makedirs(args.out_path)
 
     # sort based on accuracy (descending)
     idx_sorted = np.argsort(avg_tbl['acc'].values)[::-1]
@@ -92,8 +92,8 @@ def main(args):
     std_tbl = std_tbl.iloc[idx_sorted].reset_index(drop=True)
 
     # save tables
-    avg_tbl.to_csv(os.path.join(args.outdir, f'average_metrics.csv'))
-    std_tbl.to_csv(os.path.join(args.outdir, f'std_metrics.csv'))
+    avg_tbl.to_csv(os.path.join(args.out_path, f'average_metrics.csv'))
+    std_tbl.to_csv(os.path.join(args.out_path, f'std_metrics.csv'))
 
     # save hyperparameters
     hypers = []
@@ -102,14 +102,14 @@ def main(args):
         hypers.append(hyper)
 
     # save hyperparameters as a json file
-    with open(os.path.join(args.outdir, f'configs.json'), 'w') as fp:
+    with open(os.path.join(args.out_path, f'configs.json'), 'w') as fp:
         json.dump(hypers, fp, indent=4)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('Results parser')
-    parser.add_argument('--logdir', type=str, default='./logs/')
-    parser.add_argument('--outdir', type=str, default='./out/')
+    parser.add_argument('--log_path', type=str, default='./logs/')
+    parser.add_argument('--out_path', type=str, default='./out/')
 
     args = parser.parse_args()
     main(args)
