@@ -43,8 +43,6 @@ def plot_single_cell(arch_dict, cell_name, save_path, debug=False):
     for i in range(2, 6):
         g.edge(str(i), 'c_{k}', fillcolor='gray')
 
-    g.attr(label=f'{cell_name.capitalize()} cell')
-
     g.render(save_path, cleanup=not debug)
 
 
